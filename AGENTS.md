@@ -1,30 +1,115 @@
-# Repository Guidelines
+# AGENTS.md
 
-## Project Structure & Module Organization
-This repository is intentionally small at the moment. The root contains [README.md](/Users/mikhaileliseev/Documents/Source/hexlet/ai-for-developers-project-386/README.md), which is the public project entry point, and `.github/workflows/`, which contains the Hexlet CI configuration and workflow notes. Treat `.github/workflows/hexlet-check.yml` as protected infrastructure: do not rename, delete, or edit it.
+## Проект
 
-There is no committed application source tree yet. When adding code, keep runtime files in `src/` and place tests in `tests/` so structure remains predictable as the project grows.
+Этот репозиторий содержит проект курса Hexlet AI for Developers: упрощённый сервис бронирования временных слотов по мотивам Cal.com.
 
-## Build, Test, and Development Commands
-There are no project-specific build or local test scripts in the repository yet. Current validation is driven by GitHub Actions and Hexlet after each push.
+Подход проекта: **Design First**  
+Базовая цепочка: **TypeSpec → OpenAPI → backend + frontend → e2e → CI → Docker → deploy**
 
-- `git status` checks your working tree before committing.
-- `git log --oneline` reviews recent history and existing commit style.
-- `git push origin main` triggers the remote Hexlet check workflow.
+## Источники истины
 
-If you introduce local tooling later, document it in [README.md](/Users/mikhaileliseev/Documents/Source/hexlet/ai-for-developers-project-386/README.md) and keep command names consistent with the ecosystem you choose.
+Перед нетривиальными изменениями сначала прочитай:
 
-## Coding Style & Naming Conventions
-Keep files and directories lowercase and descriptive. Prefer short, focused modules over large mixed-purpose files. Use 2 spaces for YAML and Markdown indentation to match the existing workflow files.
+- `docs/project-status.md`
+- `docs/mvp.md`
+- `spec/main.tsp`
+- `docs/domain.md`
+- `docs/master-plan.md`
+- `docs/hexlet-brief.md`
 
-Name new Markdown docs with clear nouns such as `CONTRIBUTING.md` or `docs/setup.md`. For source files, prefer conventional names from the language or framework you add rather than custom abbreviations.
+При конфликте документов используй такой приоритет:
 
-## Testing Guidelines
-Automated checks currently run in GitHub Actions through the Hexlet workflow. Until a local test runner is added, treat every push as a validation step and keep changes small enough to debug from CI output.
+1. `docs/project-status.md`
+2. `docs/mvp.md`
+3. `spec/main.tsp`
+4. `docs/domain.md`
+5. `docs/master-plan.md`
+6. `docs/hexlet-brief.md`
 
-When adding tests, mirror the source layout and use descriptive names such as `tests/auth.test.js` or `tests/user_service_test.py`.
+Если видишь расхождение, не исправляй всё молча. Сначала коротко опиши проблему и предложи минимальное исправление.
 
-## Commit & Pull Request Guidelines
-Recent commits use short imperative subjects such as `Add README.md`. Follow the same pattern: start with a verb, keep it concise, and describe one logical change per commit.
+## Текущая стадия
 
-Pull requests should include a brief summary, note any CI impact, and link the related Hexlet task or issue when applicable. If a change affects visible documentation or workflow behavior, mention it explicitly in the PR description.
+Проект **не** стартует с нуля.
+
+Уже сделано:
+
+- границы MVP зафиксированы;
+- основной TypeSpec-файл уже существует: `spec/main.tsp`.
+
+Текущий фокус:
+
+- завершить контрактный этап;
+- проверить, что `main.tsp` покрывает согласованный MVP;
+- довести контракт до консистентного состояния;
+- сгенерировать OpenAPI и зафиксировать артефакты этапа.
+
+## Что делать сейчас
+
+- проверять покрытие MVP в `main.tsp`;
+- уточнять сущности, поля, операции и ответы API;
+- улучшать консистентность TypeSpec;
+- генерировать OpenAPI из `spec/main.tsp`;
+- предлагать следующий минимальный шаг.
+
+## Что нельзя делать без явной команды
+
+- не расширять MVP;
+- не добавлять авторизацию;
+- не добавлять многопользовательский режим;
+- не добавлять интеграции с внешними календарями;
+- не добавлять уведомления, напоминания, оплату и видеоссылки;
+- не начинать полноценный backend до завершения контрактного этапа;
+- не начинать frontend до завершения контрактного этапа;
+- не полировать UI;
+- не перестраивать проект в «идеальную архитектуру».
+
+Правило: **если это не нужно для первой рабочей версии, не добавляй это самовольно.**
+
+## Правила работы
+
+- Сначала прочитай контекст, потом меняй файлы.
+- Для нетривиальной задачи сначала дай короткий план.
+- Двигайся маленькими проверяемыми шагами.
+- Не делай широкие побочные рефакторинги «по пути».
+- Предпочитай точечные изменения большой перестройке.
+- При неоднозначности сначала предложи варианты, а не угадывай молча.
+
+## Правила работы с файлами
+
+- Трогай только файлы, относящиеся к текущей задаче.
+- Не удаляй файлы из `docs/`, если об этом не попросили явно.
+- Если добавляешь новый документ, используй понятное имя и коротко объясняй, зачем он нужен.
+
+## Правила работы с git
+
+- Делай небольшие тематические коммиты.
+- Не смешивай в одном коммите несвязанные изменения.
+- Перед коммитом коротко перечисляй, что изменилось.
+- Не делай push без явной команды пользователя.
+- Не переписывай историю (`reset --hard`, `rebase`, `push --force`) без явного разрешения.
+
+Предпочтительные префиксы коммитов:
+
+- `docs:`
+- `chore:`
+- `feat:`
+- `fix:`
+- `refactor:`
+
+Коммиты можно писать на русском языке.
+
+## Поведение по умолчанию для новой сессии
+
+Если нет другой команды:
+
+1. прочитай `docs/project-status.md`;
+2. прочитай `docs/mvp.md`;
+3. прочитай `spec/main.tsp`;
+4. найди минимальный блокер для завершения контрактного этапа;
+5. предложи следующий минимальный шаг.
+
+## Главный принцип
+
+Приоритет этого проекта — не идеальный код сам по себе, а **рабочий, управляемый и собранный по шагам результат**.
