@@ -1,21 +1,22 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/xhrobj-hex/ai-for-developers-project-386/backend/internal/httpapi"
+	"github.com/xhrobj-hex/ai-for-developers-project-386/backend/internal/store"
 )
 
 func main() {
 	port := portFromEnv()
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("/health", healthHandler)
+	repo := store.NewMemoryStore()
+	handler := httpapi.NewHandler(repo)
 
 	server := &http.Server{
 		Addr:    ":" + port,
-		Handler: mux,
+		Handler: handler,
 	}
 
 	log.Printf("backend listening on :%s", port)
@@ -32,19 +33,4 @@ func portFromEnv() string {
 	}
 
 	return port
-}
-
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	_, err := fmt.Fprint(w, `{"status":"ok"}`)
-	if err != nil {
-		log.Printf("write health response: %v", err)
-	}
 }
