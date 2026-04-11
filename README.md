@@ -54,20 +54,26 @@ npm run dev -- --host 127.0.0.1 --port 5173
 
 После запуска открой `http://127.0.0.1:5173/`.
 
-Для frontend подготовлен локальный пример переменных: `frontend/.env.example`. Сейчас в нём только `VITE_API_BASE_URL=http://localhost:8080`.
+В dev-режиме frontend обращается к backend через Vite proxy `/api`, поэтому для локальной проверки backend должен быть запущен на `http://localhost:8080`.
+
+Для frontend подготовлен локальный пример переменных: `frontend/.env.example`. Сейчас в нём только `VITE_API_BASE_URL=http://localhost:8080`; это значение нужно для build/production-конфига, а не для локального dev proxy.
 
 ## Что уже готово
 
 - собрана верхнеуровневая структура репозитория;
 - контракт хранится в `contracts/`;
 - backend MVP реализует основной API-сценарий на Go с in-memory хранением;
-- frontend-каркас на React + TypeScript + Vite показывает простую страницу-заглушку проекта.
+- frontend MVP на React + TypeScript + Vite подключён к backend API;
+- публичный сценарий работает через `/` -> `/book/:eventTypeId` -> `/book/:eventTypeId/confirm`;
+- owner-часть работает через `/admin`: создание event type и просмотр upcoming bookings.
 
 ## Что пока не реализовано
 
-- интеграция frontend с backend;
-- формы бронирования и административные экраны;
-- авторизация, БД, Docker и деплой.
+- отдельный интеграционный этап со сквозной проверкой всего потока;
+- e2e-тесты и полноценный CI;
+- авторизация и защита `/admin`;
+- редактирование и удаление event type;
+- БД, Docker и деплой.
 
 ---
 
