@@ -99,10 +99,11 @@ npm run test:e2e
 - публичный сценарий работает через `/` -> `/book/:eventTypeId` -> `/book/:eventTypeId/confirm`;
 - owner-часть работает через `/admin`: создание event type и просмотр upcoming bookings.
 - Playwright e2e покрывает happy path, duplicate booking и invalid owner form submit.
+- GitHub Actions CI запускает контракты, backend, frontend build и e2e на `push` и `pull_request`.
+- SonarQube Cloud подключён к CI в режиме CI-based analysis.
 
 ## Что пока не реализовано
 
-- полноценный CI;
 - авторизация и защита `/admin`;
 - редактирование и удаление event type;
 - БД, Docker и деплой.
