@@ -68,11 +68,16 @@ body {
 }
 
 .app-header__title,
-h1,
-.ui-card__title {
+h1 {
   margin: 0;
   font-size: clamp(2rem, 6vw, 3.5rem);
   line-height: 1.05;
+}
+
+.ui-card__title {
+  margin: 0;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  line-height: 1.1;
 }
 
 .app-nav {
@@ -105,6 +110,10 @@ h1,
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
+.screen-state {
+  max-width: 760px;
+}
+
 .screen-list {
   margin: 0;
   padding-left: 20px;
@@ -124,6 +133,28 @@ h1,
 .screen-action,
 .screen-actions a {
   text-decoration: none;
+}
+
+.screen-state__message {
+  margin: 0;
+  color: var(--text-body);
+}
+
+.event-type-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.event-type-card {
+  height: 100%;
+}
+
+.event-type-card__meta {
+  display: grid;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
 }
 
 .ui-card {
