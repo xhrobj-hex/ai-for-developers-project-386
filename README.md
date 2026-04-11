@@ -110,3 +110,7 @@ npm run test:e2e
 ### Hexlet tests and linter status
 
 [![Actions Status](https://github.com/xhrobj-hex/ai-for-developers-project-386/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/xhrobj-hex/ai-for-developers-project-386/actions)
+
+### SonarQube Cloud
+
+[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=xhrobj-hex_ai-for-developers-project-386)
