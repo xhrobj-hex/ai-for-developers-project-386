@@ -3,7 +3,7 @@
 ## Источники истины на текущем этапе
 
 - MVP: docs/mvp.md
-- Контракт: spec/main.tsp
+- Контракт: contracts/typespec/main.tsp
 - Общий roadmap: docs/master-plan.md
 - Текущий статус: docs/project-status.md
 
@@ -61,7 +61,7 @@
 
 - Этап 0 завершён: границы MVP зафиксированы.
 - Этап 1 завершён: контрактный этап закрыт.
-- Артефакты этапа: `spec/main.tsp`, `spec/openapi.yaml`.
+- Артефакты этапа: `contracts/typespec/main.tsp`, `contracts/openapi/openapi.yaml`.
 - Добавлена минимальная инфраструктура TypeSpec/OpenAPI: `package.json`, `package-lock.json`, `tspconfig.yaml`.
 - Следующий этап: Этап 2 — технический каркас.
 

@@ -13,7 +13,7 @@
 
 - `docs/project-status.md`
 - `docs/mvp.md`
-- `spec/main.tsp`
+- `contracts/typespec/main.tsp`
 - `docs/domain.md`
 - `docs/master-plan.md`
 - `docs/hexlet-brief.md`
@@ -22,7 +22,7 @@
 
 1. `docs/project-status.md`
 2. `docs/mvp.md`
-3. `spec/main.tsp`
+3. `contracts/typespec/main.tsp`
 4. `docs/domain.md`
 5. `docs/master-plan.md`
 6. `docs/hexlet-brief.md`
@@ -36,7 +36,7 @@
 Уже сделано:
 
 - границы MVP зафиксированы;
-- основной TypeSpec-файл уже существует: `spec/main.tsp`.
+- основной TypeSpec-файл уже существует: `contracts/typespec/main.tsp`.
 
 Текущий фокус:
 
@@ -50,7 +50,7 @@
 - проверять покрытие MVP в `main.tsp`;
 - уточнять сущности, поля, операции и ответы API;
 - улучшать консистентность TypeSpec;
-- генерировать OpenAPI из `spec/main.tsp`;
+- генерировать OpenAPI из `contracts/typespec/main.tsp`;
 - предлагать следующий минимальный шаг.
 
 ## Что нельзя делать без явной команды
@@ -106,7 +106,7 @@
 
 1. прочитай `docs/project-status.md`;
 2. прочитай `docs/mvp.md`;
-3. прочитай `spec/main.tsp`;
+3. прочитай `contracts/typespec/main.tsp`;
 4. найди минимальный блокер для завершения контрактного этапа;
 5. предложи следующий минимальный шаг.
 
