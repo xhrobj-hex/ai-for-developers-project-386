@@ -25,9 +25,23 @@ export async function apiGet(path: string, options: ApiRequestOptions = {}) {
     signal: options.signal,
   });
 
+  const payload = await response.json();
+
   if (!response.ok) {
+    if (hasErrorMessage(payload)) {
+      throw new Error(payload.message);
+    }
+
     throw new Error(`API request failed with status ${response.status}`);
   }
 
-  return response.json();
+  return payload;
+}
+
+function hasErrorMessage(value: unknown): value is { message: string } {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  return typeof (value as { message?: unknown }).message === "string";
 }
