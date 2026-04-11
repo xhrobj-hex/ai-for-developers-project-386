@@ -4,7 +4,7 @@
 
 ## Структура репозитория
 
-- `backend/` — минимальный backend на Go. Сейчас содержит только HTTP-сервер и `GET /health`.
+- `backend/` — backend на Go с in-memory хранением и реализацией MVP endpoint'ов по контракту.
 - `frontend/` — минимальный frontend на React + TypeScript + Vite.
 - `contracts/typespec/` — контракт API в TypeSpec.
 - `contracts/openapi/` — сгенерированная OpenAPI-спека.
@@ -26,6 +26,24 @@ PORT=8090 go run ./cmd/api
 
 Health-check: `GET http://localhost:8080/health`
 
+Реализованные backend endpoint'ы:
+
+- `GET /health`
+- `GET /event-types`
+- `GET /event-types/{eventTypeId}/slots`
+- `POST /bookings`
+- `POST /admin/event-types`
+- `GET /admin/bookings/upcoming`
+
+Данные backend хранятся только in-memory и сбрасываются после рестарта процесса.
+
+Текущие backend MVP-допущения, которые используются в реализации, но не являются частью контракта:
+
+- слоты генерируются только на ближайшие 14 дней;
+- рабочее окно: каждый день с `09:00` до `18:00`;
+- шаг сетки слотов: `30 минут`;
+- все расчёты времени выполняются в `UTC`.
+
 ## Запуск frontend
 
 ```bash
@@ -38,17 +56,15 @@ npm run dev -- --host 127.0.0.1 --port 5173
 
 Для frontend подготовлен локальный пример переменных: `frontend/.env.example`. Сейчас в нём только `VITE_API_BASE_URL=http://localhost:8080`.
 
-## Что уже готово на этапе 2
+## Что уже готово
 
 - собрана верхнеуровневая структура репозитория;
 - контракт хранится в `contracts/`;
-- backend-каркас на Go поднимает сервер и отвечает на `GET /health`;
+- backend MVP реализует основной API-сценарий на Go с in-memory хранением;
 - frontend-каркас на React + TypeScript + Vite показывает простую страницу-заглушку проекта.
 
 ## Что пока не реализовано
 
-- booking API и любая бизнес-логика;
-- in-memory хранилище данных;
 - интеграция frontend с backend;
 - формы бронирования и административные экраны;
 - авторизация, БД, Docker и деплой.
