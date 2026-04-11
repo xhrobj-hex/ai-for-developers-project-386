@@ -60,13 +60,33 @@ npm run dev -- --host 127.0.0.1 --port 5173
 
 ## E2E Playwright
 
-Запуск e2e выполняется одной командой от корня проекта:
+Локальная последовательность для e2e:
+
+```bash
+npm run test:e2e:setup
+npm run test:e2e
+```
+
+`npm run test:e2e:setup` нужен только для одноразовой локальной установки Chromium. После этого обычно достаточно:
 
 ```bash
 npm run test:e2e
 ```
 
-Команда при первом запуске устанавливает Chromium для Playwright, поднимает отдельный backend на `http://127.0.0.1:18080`, запускает отдельный frontend dev server на `http://127.0.0.1:14173` и прогоняет e2e против реального UI и backend. Это не конфликтует с обычным локальным запуском на `8080` и `5173`.
+Команда `npm run test:e2e` поднимает отдельный backend на `http://127.0.0.1:18080`, запускает отдельный frontend dev server на `http://127.0.0.1:14173` и прогоняет e2e против реального UI и backend. Это не конфликтует с обычным локальным запуском на `8080` и `5173`.
+
+## CI
+
+Для проекта добавлен отдельный workflow `ci.yml`, который запускается автоматически на `push` и `pull_request`.
+
+В CI выполняются:
+
+- проверка TypeSpec/OpenAPI на актуальность;
+- backend-проверки через `go test ./...`;
+- frontend build через `npm ci --prefix frontend` и `npm run build`;
+- Playwright e2e через `npm run test:e2e`.
+
+`hexlet-check.yml` остаётся отдельным служебным workflow Hexlet и не заменяется этим CI.
 
 ## Что уже готово
 
