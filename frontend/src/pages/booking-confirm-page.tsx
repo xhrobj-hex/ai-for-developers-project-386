@@ -81,7 +81,7 @@ export function BookingConfirmPage() {
   if (state.status === "error" && !state.slot) {
     return (
       <section className="screen-grid">
-        <Card className="screen-state">
+        <Card className="screen-state" data-testid="booking-missing-slot">
           <CardHeader>
             <Badge>Error</Badge>
             <CardTitle>Невозможно подтвердить бронирование</CardTitle>
@@ -113,7 +113,7 @@ export function BookingConfirmPage() {
   if (state.status === "success") {
     return (
       <section className="screen-grid">
-        <Card className="screen-state">
+        <Card className="screen-state" data-testid="booking-success">
           <CardHeader>
             <Badge>Success</Badge>
             <CardTitle>Бронирование создано</CardTitle>
@@ -165,7 +165,7 @@ export function BookingConfirmPage() {
 
   return (
     <section className="screen-grid">
-      <Card>
+      <Card data-testid="booking-confirm">
         <CardHeader>
           <Badge>Маршрут /book/:eventTypeId/confirm</Badge>
           <CardTitle>Подтверждение бронирования</CardTitle>
@@ -195,7 +195,7 @@ export function BookingConfirmPage() {
             <Link className={cn("ui-button", "ui-button--ghost")} to={`/book/${eventTypeId}`}>
               Назад к слотам
             </Link>
-            <Button onClick={handleSubmit} disabled={state.status === "submitting"}>
+            <Button data-testid="booking-submit" onClick={handleSubmit} disabled={state.status === "submitting"}>
               {state.status === "submitting" ? "Создаём бронирование..." : "Подтвердить бронирование"}
             </Button>
           </div>
@@ -213,7 +213,7 @@ export function BookingConfirmPage() {
       )}
 
       {state.status === "slot-conflict" && (
-        <Card className="screen-state">
+        <Card className="screen-state" data-testid="booking-slot-conflict">
           <CardHeader>
             <Badge>409</Badge>
             <CardTitle>Слот уже занят</CardTitle>
@@ -233,7 +233,7 @@ export function BookingConfirmPage() {
       )}
 
       {state.status === "rule-violation" && (
-        <Card className="screen-state">
+        <Card className="screen-state" data-testid="booking-rule-violation">
           <CardHeader>
             <Badge>422</Badge>
             <CardTitle>Слот больше не проходит правила бронирования</CardTitle>

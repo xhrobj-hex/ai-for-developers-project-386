@@ -140,7 +140,7 @@ export function BookEventPage() {
       {state.status === "success" && state.slots.length > 0 && (
         <div className="slot-group-list">
           {groupedSlots.map((group) => (
-            <Card key={group.dateKey}>
+            <Card key={group.dateKey} data-testid="slot-group">
               <CardHeader>
                 <Badge>{group.slots.length} слотов</Badge>
                 <CardTitle>{group.label}</CardTitle>
@@ -152,6 +152,7 @@ export function BookEventPage() {
                     <Link
                       key={`${slot.eventTypeId}-${slot.startAt}`}
                       className={cn("slot-pill", "slot-pill--interactive")}
+                      data-testid="slot-option"
                       to={`/book/${eventTypeId}/confirm`}
                       state={{ slot }}
                     >

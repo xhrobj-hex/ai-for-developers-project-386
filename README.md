@@ -58,6 +58,16 @@ npm run dev -- --host 127.0.0.1 --port 5173
 
 Для frontend подготовлен локальный пример переменных: `frontend/.env.example`. Сейчас в нём только `VITE_API_BASE_URL=http://localhost:8080`; это значение нужно для build/production-конфига, а не для локального dev proxy.
 
+## E2E Playwright
+
+Запуск e2e выполняется одной командой от корня проекта:
+
+```bash
+npm run test:e2e
+```
+
+Команда при первом запуске устанавливает Chromium для Playwright, поднимает отдельный backend на `http://127.0.0.1:18080`, запускает отдельный frontend dev server на `http://127.0.0.1:14173` и прогоняет e2e против реального UI и backend. Это не конфликтует с обычным локальным запуском на `8080` и `5173`.
+
 ## Что уже готово
 
 - собрана верхнеуровневая структура репозитория;
@@ -66,11 +76,11 @@ npm run dev -- --host 127.0.0.1 --port 5173
 - frontend MVP на React + TypeScript + Vite подключён к backend API;
 - публичный сценарий работает через `/` -> `/book/:eventTypeId` -> `/book/:eventTypeId/confirm`;
 - owner-часть работает через `/admin`: создание event type и просмотр upcoming bookings.
+- Playwright e2e покрывает happy path, duplicate booking и invalid owner form submit.
 
 ## Что пока не реализовано
 
-- отдельный интеграционный этап со сквозной проверкой всего потока;
-- e2e-тесты и полноценный CI;
+- полноценный CI;
 - авторизация и защита `/admin`;
 - редактирование и удаление event type;
 - БД, Docker и деплой.

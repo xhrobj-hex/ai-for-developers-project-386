@@ -100,7 +100,7 @@ export function HomePage() {
       {state.status === "success" && state.eventTypes.length > 0 && (
         <div className="event-type-grid">
           {state.eventTypes.map((eventType) => (
-            <Card key={eventType.id} className="event-type-card">
+            <Card key={eventType.id} className="event-type-card" data-testid="event-type-card">
               <CardHeader>
                 <Badge>{formatDuration(eventType.durationMinutes)}</Badge>
                 <CardTitle>{eventType.name}</CardTitle>
@@ -111,7 +111,11 @@ export function HomePage() {
                   <span>Длительность: {formatDuration(eventType.durationMinutes)}</span>
                   <span>Переход ведёт на выбор слотов</span>
                 </div>
-                <Link className={cn("ui-button", "ui-button--primary", "screen-action")} to={`/book/${eventType.id}`}>
+                <Link
+                  className={cn("ui-button", "ui-button--primary", "screen-action")}
+                  data-testid="event-type-open"
+                  to={`/book/${eventType.id}`}
+                >
                   Выбрать тип события
                 </Link>
               </CardContent>

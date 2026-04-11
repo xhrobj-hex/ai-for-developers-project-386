@@ -12,3 +12,7 @@ backend/api
 
 # Frontend build artifacts
 frontend/dist/
+
+# Playwright
+frontend/playwright-report/
+frontend/test-results/

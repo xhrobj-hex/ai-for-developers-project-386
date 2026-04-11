@@ -140,7 +140,7 @@ export function AdminPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="admin-form" onSubmit={handleSubmit}>
+          <form className="admin-form" data-testid="event-type-form" onSubmit={handleSubmit}>
             <label className="form-field">
               <span className="form-field__label">Название</span>
               <input
@@ -180,7 +180,7 @@ export function AdminPage() {
             </label>
 
             <div className="screen-actions">
-              <Button type="submit" disabled={createState.status === "submitting"}>
+              <Button data-testid="event-type-submit" type="submit" disabled={createState.status === "submitting"}>
                 {createState.status === "submitting" ? "Создаём тип события..." : "Создать тип события"}
               </Button>
             </div>
@@ -191,7 +191,7 @@ export function AdminPage() {
           )}
 
           {createState.status === "success" && (
-            <div className="admin-feedback admin-feedback--success">
+            <div className="admin-feedback admin-feedback--success" data-testid="event-type-success">
               <p className="admin-feedback__title">Тип события создан</p>
               <p className="admin-feedback__text">
                 ID: <code>{createState.eventType.id}</code>, название: <strong>{createState.eventType.name}</strong>,{" "}
@@ -201,7 +201,7 @@ export function AdminPage() {
           )}
 
           {createState.status === "error" && (
-            <div className="admin-feedback admin-feedback--error">
+            <div className="admin-feedback admin-feedback--error" data-testid="event-type-error">
               <p className="admin-feedback__title">Не удалось создать тип события</p>
               <p className="admin-feedback__text">
                 <code>{createState.message}</code>
@@ -219,7 +219,7 @@ export function AdminPage() {
             Блок только читает данные из контрактного <code>GET /admin/bookings/upcoming</code> без клиентских вычислений.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent data-testid="upcoming-bookings">
           {upcomingState.status === "loading" && (
             <div className="admin-feedback">
               <p className="admin-feedback__title">Loading</p>
@@ -246,7 +246,7 @@ export function AdminPage() {
           {upcomingState.status === "success" && (
             <div className="admin-list">
               {upcomingState.bookings.map((booking) => (
-                <article key={booking.id} className="admin-list__item">
+                <article key={booking.id} className="admin-list__item" data-testid="upcoming-booking-item">
                   <div className="admin-list__heading">
                     <strong>{booking.eventTypeName}</strong>
                     <span>
