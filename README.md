@@ -90,6 +90,36 @@ npm run test:e2e
 
 После успешных CI-job'ов отдельно запускается SonarQube Cloud analysis. Этот шаг пока неблокирующий: он не используется как quality gate для падения всего workflow.
 
+## Docker
+
+Для локального воспроизводимого запуска в контейнерах используются два сервиса:
+
+- `backend`
+- `frontend`
+
+Запуск:
+
+```bash
+docker compose up --build
+```
+
+Если порты `8080` или `5173` уже заняты локальными процессами, можно переопределить host-порты:
+
+```bash
+BACKEND_PORT=18080 FRONTEND_PORT=15173 docker compose up --build
+```
+
+После старта:
+
+- frontend: `http://localhost:5173/`
+- backend health: `http://localhost:8080/health`
+
+При переопределении портов используйте соответствующие значения в адресах проверки.
+
+Frontend в контейнере собирается как production build и обращается к backend через same-origin путь `/api`, который проксируется `nginx` на сервис `backend`. Отдельный CORS для этого сценария не нужен.
+
+Данные backend по-прежнему хранятся только in-memory и после рестарта backend-контейнера сбрасываются.
+
 ## Что уже готово
 
 - собрана верхнеуровневая структура репозитория;
@@ -101,12 +131,13 @@ npm run test:e2e
 - Playwright e2e покрывает happy path, duplicate booking и invalid owner form submit.
 - GitHub Actions CI запускает контракты, backend, frontend build и e2e на `push` и `pull_request`.
 - SonarQube Cloud подключён к CI в режиме CI-based analysis.
+- Добавлен локальный Docker-запуск через `docker compose up --build`.
 
 ## Что пока не реализовано
 
 - авторизация и защита `/admin`;
 - редактирование и удаление event type;
-- БД, Docker и деплой.
+- БД и deploy.
 
 ---
 
