@@ -94,6 +94,8 @@ npm run test:e2e
 
 Для проекта используется один корневой `Dockerfile`: внутри одного контейнера собираются backend и frontend, backend запускается в фоне, а `nginx` раздаёт frontend и проксирует `/api` на внутренний backend.
 
+Локальный контейнерный запуск воспроизводим одной командой и проверен на переменной окружения `PORT`.
+
 Сборка образа:
 
 ```bash
@@ -127,7 +129,7 @@ Frontend в образе собирается как production build с `VITE_A
 - Playwright e2e покрывает happy path, duplicate booking и invalid owner form submit.
 - GitHub Actions CI запускает контракты, backend, frontend build и e2e на `push` и `pull_request`.
 - SonarQube Cloud подключён к CI в режиме CI-based analysis.
-- Добавлен корневой Dockerfile для локального запуска проекта в одном контейнере.
+- Локальный запуск в Docker воспроизводим через один корневой `Dockerfile` и один контейнер.
 
 ## Что пока не реализовано
 
