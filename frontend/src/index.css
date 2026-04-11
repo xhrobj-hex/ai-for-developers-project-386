@@ -196,10 +196,48 @@ h1 {
   background: var(--ghost-bg);
   color: var(--text-body);
   font-weight: 600;
+  text-decoration: none;
 }
 
 .slot-pill__divider {
   color: var(--text-muted);
+}
+
+.slot-pill--interactive:hover {
+  transform: translateY(-1px);
+  border-color: #b9e5df;
+  background: rgba(215, 243, 239, 0.44);
+}
+
+.summary-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.summary-list__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.summary-list__row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.summary-list dt {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.summary-list dd {
+  margin: 0;
+  color: var(--text-body);
+  text-align: right;
 }
 
 .ui-card {
@@ -259,6 +297,12 @@ h1 {
 
 .ui-button:hover {
   transform: translateY(-1px);
+}
+
+.ui-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+  transform: none;
 }
 
 .ui-button--primary {

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatUtcDate, formatUtcTime } from "@/lib/format/utc";
 import { listEventTypeSlots } from "@/lib/api/slots";
 import type { Slot } from "@/lib/types/slot";
 import { cn } from "@/lib/utils";
@@ -148,11 +149,16 @@ export function BookEventPage() {
               <CardContent>
                 <div className="slot-grid">
                   {group.slots.map((slot) => (
-                    <div key={`${slot.eventTypeId}-${slot.startAt}`} className="slot-pill">
+                    <Link
+                      key={`${slot.eventTypeId}-${slot.startAt}`}
+                      className={cn("slot-pill", "slot-pill--interactive")}
+                      to={`/book/${eventTypeId}/confirm`}
+                      state={{ slot }}
+                    >
                       <span>{formatUtcTime(slot.startAt)}</span>
                       <span className="slot-pill__divider">—</span>
                       <span>{formatUtcTime(slot.endAt)}</span>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </CardContent>
@@ -163,19 +169,6 @@ export function BookEventPage() {
     </section>
   );
 }
-
-const utcDateFormatter = new Intl.DateTimeFormat("ru-RU", {
-  timeZone: "UTC",
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-});
-
-const utcTimeFormatter = new Intl.DateTimeFormat("ru-RU", {
-  timeZone: "UTC",
-  hour: "2-digit",
-  minute: "2-digit",
-});
 
 function groupSlotsByDate(slots: Slot[]): SlotGroup[] {
   const groups = new Map<string, Slot[]>();
@@ -190,11 +183,7 @@ function groupSlotsByDate(slots: Slot[]): SlotGroup[] {
 
   return Array.from(groups.entries()).map(([dateKey, groupedSlots]) => ({
     dateKey,
-    label: utcDateFormatter.format(new Date(`${dateKey}T00:00:00Z`)),
+    label: formatUtcDate(`${dateKey}T00:00:00Z`),
     slots: groupedSlots,
   }));
-}
-
-function formatUtcTime(dateTime: string) {
-  return utcTimeFormatter.format(new Date(dateTime));
 }
