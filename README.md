@@ -92,33 +92,29 @@ npm run test:e2e
 
 ## Docker
 
-Для локального воспроизводимого запуска в контейнерах используются два сервиса:
+Для проекта используется один корневой `Dockerfile`: внутри одного контейнера собираются backend и frontend, backend запускается в фоне, а `nginx` раздаёт frontend и проксирует `/api` на внутренний backend.
 
-- `backend`
-- `frontend`
-
-Запуск:
+Сборка образа:
 
 ```bash
-docker compose up --build
+docker build -t calendar-booking .
 ```
 
-Если порты `8080` или `5173` уже заняты локальными процессами, можно переопределить host-порты:
+Запуск контейнера:
 
 ```bash
-BACKEND_PORT=18080 FRONTEND_PORT=15173 docker compose up --build
+docker run --rm -e PORT=8080 -p 8080:8080 calendar-booking
 ```
 
 После старта:
 
-- frontend: `http://localhost:5173/`
+- frontend: `http://localhost:8080/`
 - backend health: `http://localhost:8080/health`
+- backend через frontend proxy: `http://localhost:8080/api/health`
 
-При переопределении портов используйте соответствующие значения в адресах проверки.
+Frontend в образе собирается как production build с `VITE_API_BASE_URL=/api`, поэтому браузер работает через same-origin `/api` и отдельный CORS для этого сценария не нужен.
 
-Frontend в контейнере собирается как production build и обращается к backend через same-origin путь `/api`, который проксируется `nginx` на сервис `backend`. Отдельный CORS для этого сценария не нужен.
-
-Данные backend по-прежнему хранятся только in-memory и после рестарта backend-контейнера сбрасываются.
+Данные backend по-прежнему хранятся только in-memory и после рестарта контейнера сбрасываются.
 
 ## Что уже готово
 
@@ -131,13 +127,13 @@ Frontend в контейнере собирается как production build и
 - Playwright e2e покрывает happy path, duplicate booking и invalid owner form submit.
 - GitHub Actions CI запускает контракты, backend, frontend build и e2e на `push` и `pull_request`.
 - SonarQube Cloud подключён к CI в режиме CI-based analysis.
-- Добавлен локальный Docker-запуск через `docker compose up --build`.
+- Добавлен корневой Dockerfile для локального запуска проекта в одном контейнере.
 
 ## Что пока не реализовано
 
 - авторизация и защита `/admin`;
 - редактирование и удаление event type;
-- БД и deploy.
+- deploy.
 
 ---
 
