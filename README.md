@@ -2,6 +2,12 @@
 
 Учебный проект курса Hexlet AI for Developers: упрощённый сервис бронирования временных слотов по мотивам Cal.com. Проект развивается по подходу Design First: сначала контракт в TypeSpec и OpenAPI, затем технический каркас, backend и frontend.
 
+## Публичный деплой
+
+Приложение развёрнуто в Render и доступно по адресу: `https://xhrobj-ai-cal-386.onrender.com`
+
+Публичный health-check: `https://xhrobj-ai-cal-386.onrender.com/health`
+
 ## Структура репозитория
 
 - `backend/` — backend на Go с in-memory хранением и реализацией MVP endpoint'ов по контракту.
@@ -130,12 +136,12 @@ Frontend в образе собирается как production build с `VITE_A
 - GitHub Actions CI запускает контракты, backend, frontend build и e2e на `push` и `pull_request`.
 - SonarQube Cloud подключён к CI в режиме CI-based analysis.
 - Локальный запуск в Docker воспроизводим через один корневой `Dockerfile` и один контейнер.
+- Деплой в Render выполнен и подтверждён на публичном URL `https://xhrobj-ai-cal-386.onrender.com`.
 
 ## Что пока не реализовано
 
 - авторизация и защита `/admin`;
 - редактирование и удаление event type;
-- deploy.
 
 ---
 
