@@ -2,22 +2,22 @@
   font-family: "Avenir Next", "Segoe UI", sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #16303a;
+  color: #241f3e;
   --surface: rgba(255, 255, 255, 0.86);
   --surface-strong: rgba(255, 255, 255, 0.96);
-  --surface-subtle: rgba(247, 251, 249, 0.92);
-  --surface-border: rgba(15, 23, 42, 0.08);
-  --surface-border-strong: rgba(15, 23, 42, 0.14);
-  --text-title: #16303a;
-  --text-body: #334155;
-  --text-muted: #64748b;
-  --brand: #0f766e;
-  --brand-dark: #115e59;
-  --brand-soft: #dcf5f1;
-  --brand-softer: rgba(220, 245, 241, 0.56);
+  --surface-subtle: rgba(243, 244, 255, 0.92);
+  --surface-border: rgba(76, 70, 124, 0.12);
+  --surface-border-strong: rgba(76, 70, 124, 0.18);
+  --text-title: #241f3e;
+  --text-body: #4e4b65;
+  --text-muted: #7a7794;
+  --brand: #5b61f6;
+  --brand-dark: #494ed8;
+  --brand-soft: #ebe9ff;
+  --brand-softer: rgba(235, 233, 255, 0.68);
   --ghost-bg: rgba(255, 255, 255, 0.72);
-  --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.07);
-  --shadow-hover: 0 16px 30px rgba(15, 118, 110, 0.1);
+  --shadow-soft: 0 18px 45px rgba(40, 36, 78, 0.08);
+  --shadow-hover: 0 16px 30px rgba(91, 97, 246, 0.12);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -34,8 +34,8 @@ body {
   min-height: 100vh;
   background:
     radial-gradient(circle at top left, rgba(255, 255, 255, 0.96), transparent 34%),
-    radial-gradient(circle at top right, rgba(220, 245, 241, 0.72), transparent 24%),
-    linear-gradient(180deg, #f7faf8 0%, #eff5f2 100%);
+    radial-gradient(circle at top right, rgba(196, 181, 253, 0.42), transparent 24%),
+    linear-gradient(180deg, #f8f7ff 0%, #eef2ff 100%);
   color: var(--text-body);
 }
 
@@ -109,7 +109,7 @@ h1 {
 }
 
 .app-nav__link.is-active {
-  border-color: rgba(15, 118, 110, 0.18);
+  border-color: rgba(91, 97, 246, 0.2);
   background: var(--brand-soft);
   color: var(--brand-dark);
 }
@@ -134,7 +134,7 @@ h1 {
 }
 
 .hero-card {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(247, 251, 249, 0.9) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(243, 244, 255, 0.9) 100%);
 }
 
 .hero-card__header {
@@ -247,23 +247,23 @@ h1 {
 
 .slot-pill--interactive:hover {
   transform: translateY(-1px);
-  border-color: rgba(15, 118, 110, 0.22);
+  border-color: rgba(91, 97, 246, 0.22);
   background: var(--brand-softer);
   box-shadow: var(--shadow-hover);
 }
 
 .slot-pill--interactive:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.16);
+  box-shadow: 0 0 0 4px rgba(91, 97, 246, 0.16);
 }
 
 .booking-highlight {
   display: grid;
   gap: 6px;
   padding: 18px 20px;
-  border: 1px solid rgba(15, 118, 110, 0.16);
+  border: 1px solid rgba(91, 97, 246, 0.16);
   border-radius: 22px;
-  background: linear-gradient(180deg, rgba(220, 245, 241, 0.7) 0%, rgba(255, 255, 255, 0.94) 100%);
+  background: linear-gradient(180deg, rgba(235, 233, 255, 0.76) 0%, rgba(255, 255, 255, 0.94) 100%);
 }
 
 .booking-highlight__label {
@@ -315,7 +315,7 @@ h1 {
 }
 
 .form-field__control::placeholder {
-  color: #94a3b8;
+  color: #9a97b0;
 }
 
 .form-field__control--textarea {
@@ -326,8 +326,8 @@ h1 {
 
 .form-field__control:focus {
   outline: none;
-  border-color: rgba(15, 118, 110, 0.34);
-  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+  border-color: rgba(91, 97, 246, 0.34);
+  box-shadow: 0 0 0 4px rgba(91, 97, 246, 0.12);
 }
 
 .admin-inline-note {
@@ -345,8 +345,8 @@ h1 {
 }
 
 .admin-feedback--success {
-  border-color: rgba(15, 118, 110, 0.18);
-  background: rgba(220, 245, 241, 0.58);
+  border-color: rgba(91, 97, 246, 0.18);
+  background: rgba(235, 233, 255, 0.68);
 }
 
 .admin-feedback--error {
@@ -473,7 +473,7 @@ h1 {
   display: inline-flex;
   width: fit-content;
   padding: 7px 10px;
-  border: 1px solid rgba(15, 118, 110, 0.16);
+  border: 1px solid rgba(91, 97, 246, 0.16);
   border-radius: 999px;
   background: var(--brand-soft);
   color: var(--brand-dark);
@@ -509,7 +509,7 @@ h1 {
 
 .ui-button:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.14);
+  box-shadow: 0 0 0 4px rgba(91, 97, 246, 0.14);
 }
 
 .ui-button:disabled {
@@ -519,13 +519,13 @@ h1 {
 }
 
 .ui-button--primary {
-  background: linear-gradient(135deg, #0f766e 0%, #159086 100%);
+  background: linear-gradient(135deg, #5b61f6 0%, #494ed8 100%);
   color: #fff;
-  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.18);
+  box-shadow: 0 12px 24px rgba(91, 97, 246, 0.18);
 }
 
 .ui-button--primary:hover {
-  box-shadow: 0 14px 26px rgba(15, 118, 110, 0.22);
+  box-shadow: 0 14px 26px rgba(91, 97, 246, 0.24);
 }
 
 .ui-button--ghost {
