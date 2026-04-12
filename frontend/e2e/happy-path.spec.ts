@@ -15,6 +15,7 @@ test("owner creates an event type, guest books a slot, owner sees upcoming booki
 
   await expect(page.getByTestId("event-type-success")).toBeVisible();
   await expect(page.getByTestId("event-type-success")).toContainText(eventTypeName);
+  await expect(page.getByTestId("event-type-success")).toContainText(eventTypeDescription);
 
   await page.goto("/");
 
@@ -26,6 +27,9 @@ test("owner creates an event type, guest books a slot, owner sees upcoming booki
   await expect(firstSlot).toBeVisible();
   await firstSlot.click();
 
+  await expect(page).toHaveURL(/\/book\/.+\/confirm\?startAt=/);
+  await expect(page.getByTestId("booking-confirm")).toBeVisible();
+  await page.reload();
   await expect(page.getByTestId("booking-confirm")).toBeVisible();
   await page.getByTestId("booking-submit").click();
   await expect(page.getByTestId("booking-success")).toBeVisible();

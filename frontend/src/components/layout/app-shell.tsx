@@ -2,8 +2,8 @@ import { NavLink, Outlet } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { to: "/", label: "Публичная запись", end: true },
-  { to: "/admin", label: "Админ-раздел", end: false },
+  { to: "/", label: "Запись", end: true },
+  { to: "/admin", label: "Владелец", end: false },
 ];
 
 export function AppShell() {
@@ -12,8 +12,11 @@ export function AppShell() {
       <header className="app-header">
         <div className="app-header__inner">
           <div>
-            <p className="app-header__eyebrow">Этап 4 · frontend MVP plan</p>
+            <p className="app-header__eyebrow">Демо сервиса бронирования</p>
             <h1 className="app-header__title">Календарь звонков</h1>
+            <p className="app-header__lead">
+              Гость выбирает тип встречи и свободное время, владелец создаёт события и видит предстоящие бронирования.
+            </p>
           </div>
           <nav className="app-nav" aria-label="Основная навигация">
             {navItems.map((item) => (

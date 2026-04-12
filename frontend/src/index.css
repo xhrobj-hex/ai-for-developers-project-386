@@ -74,6 +74,13 @@ h1 {
   line-height: 1.05;
 }
 
+.app-header__lead {
+  max-width: 42rem;
+  margin: 12px 0 0;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
 .ui-card__title {
   margin: 0;
   font-size: clamp(1.4rem, 3vw, 2rem);

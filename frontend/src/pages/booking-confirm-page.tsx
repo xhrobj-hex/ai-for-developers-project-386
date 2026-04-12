@@ -1,15 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { createBooking, isApiErrorWithCode } from "@/lib/api/bookings";
+import { listEventTypeSlots } from "@/lib/api/slots";
 import { formatUtcDateTime } from "@/lib/format/utc";
 import type { Booking } from "@/lib/types/booking";
 import { isSlot, type Slot } from "@/lib/types/slot";
 import { cn } from "@/lib/utils";
 
 type BookingConfirmState =
+  | { status: "resolving" }
   | { status: "idle"; slot: Slot }
   | { status: "submitting"; slot: Slot }
   | { status: "success"; booking: Booking }
@@ -20,22 +22,86 @@ type BookingConfirmState =
 export function BookingConfirmPage() {
   const { eventTypeId } = useParams();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
 
-  const selectedSlot = useMemo(() => getSlotFromLocationState(location.state), [location.state]);
-  const [state, setState] = useState<BookingConfirmState>(() => buildInitialState(eventTypeId, selectedSlot));
+  const slotFromState = getSlotFromLocationState(location.state);
+  const requestedStartAt = searchParams.get("startAt")?.trim() ?? "";
+  const selectedSlot = getSelectedSlot(slotFromState, eventTypeId, requestedStartAt);
+  const [state, setState] = useState<BookingConfirmState>(() =>
+    buildInitialState(eventTypeId, requestedStartAt, selectedSlot),
+  );
 
   const canReturnToSlots = Boolean(eventTypeId);
 
   useEffect(() => {
-    setState(buildInitialState(eventTypeId, selectedSlot));
-  }, [eventTypeId, selectedSlot?.eventTypeId, selectedSlot?.startAt, selectedSlot?.endAt]);
-
-  async function handleSubmit() {
-    if (state.status === "error" || state.status === "success") {
+    if (!eventTypeId) {
+      setState({
+        status: "error",
+        message: "Не удалось определить тип события по текущей ссылке.",
+      });
       return;
     }
 
-    const activeSlot = state.slot;
+    if (selectedSlot) {
+      setState({ status: "idle", slot: selectedSlot });
+      return;
+    }
+
+    if (!requestedStartAt) {
+      setState({
+        status: "error",
+        message: "Ссылка не содержит выбранный слот. Вернитесь к списку времени и выберите его заново.",
+      });
+      return;
+    }
+
+    const controller = new AbortController();
+    setState({ status: "resolving" });
+
+    listEventTypeSlots(eventTypeId, { signal: controller.signal })
+      .then((slots) => {
+        const resolvedSlot = slots.find((slot) => slot.startAt === requestedStartAt);
+
+        if (!resolvedSlot) {
+          setState({
+            status: "error",
+            message: "Выбранный слот больше недоступен. Откройте список свободного времени и выберите другой.",
+          });
+          return;
+        }
+
+        setState({
+          status: "idle",
+          slot: resolvedSlot,
+        });
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setState({
+          status: "error",
+          message:
+            error instanceof Error ? error.message : "Не удалось восстановить выбранный слот по текущей ссылке.",
+        });
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [eventTypeId, requestedStartAt, selectedSlot?.eventTypeId, selectedSlot?.startAt, selectedSlot?.endAt]);
+
+  async function handleSubmit() {
+    if (state.status === "resolving" || state.status === "success" || (state.status === "error" && !state.slot)) {
+      return;
+    }
+
+    const activeSlot = "slot" in state ? state.slot : undefined;
+    if (!activeSlot) {
+      return;
+    }
+
     setState({
       status: "submitting",
       slot: activeSlot,
@@ -83,12 +149,9 @@ export function BookingConfirmPage() {
       <section className="screen-grid">
         <Card className="screen-state" data-testid="booking-missing-slot">
           <CardHeader>
-            <Badge>Error</Badge>
-            <CardTitle>Невозможно подтвердить бронирование</CardTitle>
-            <CardDescription>
-              Confirm screen открыт без выбранного слота. На этом этапе бронь создаётся только после явного выбора на
-              предыдущем экране.
-            </CardDescription>
+            <Badge>Ошибка</Badge>
+            <CardTitle>Не удалось открыть подтверждение</CardTitle>
+            <CardDescription>Ссылка не содержит корректный слот или выбранное время уже недоступно.</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="screen-state__message">
@@ -110,27 +173,39 @@ export function BookingConfirmPage() {
     );
   }
 
+  if (state.status === "resolving") {
+    return (
+      <section className="screen-grid">
+        <Card className="screen-state" data-testid="booking-resolving-slot">
+          <CardHeader>
+            <Badge>Загрузка</Badge>
+            <CardTitle>Восстанавливаем выбранный слот</CardTitle>
+            <CardDescription>Проверяем, что время из ссылки всё ещё доступно для бронирования.</CardDescription>
+          </CardHeader>
+        </Card>
+      </section>
+    );
+  }
+
   if (state.status === "success") {
     return (
       <section className="screen-grid">
         <Card className="screen-state" data-testid="booking-success">
           <CardHeader>
-            <Badge>Success</Badge>
-            <CardTitle>Бронирование создано</CardTitle>
-            <CardDescription>
-              Backend подтвердил запись и вернул итоговый объект бронирования. Этот ответ остаётся source of truth.
-            </CardDescription>
+            <Badge>Готово</Badge>
+            <CardTitle>Запись подтверждена</CardTitle>
+            <CardDescription>Встреча успешно создана. Ниже показаны детали подтверждённого бронирования.</CardDescription>
           </CardHeader>
           <CardContent>
             <dl className="summary-list">
               <div className="summary-list__row">
-                <dt>Booking ID</dt>
+                <dt>ID бронирования</dt>
                 <dd>
                   <code>{state.booking.id}</code>
                 </dd>
               </div>
               <div className="summary-list__row">
-                <dt>Event type</dt>
+                <dt>ID типа события</dt>
                 <dd>
                   <code>{state.booking.eventTypeId}</code>
                 </dd>
@@ -167,17 +242,14 @@ export function BookingConfirmPage() {
     <section className="screen-grid">
       <Card data-testid="booking-confirm">
         <CardHeader>
-          <Badge>Маршрут /book/:eventTypeId/confirm</Badge>
-          <CardTitle>Подтверждение бронирования</CardTitle>
-          <CardDescription>
-            Страница отправляет только контрактный <code>POST /bookings</code> с полями <code>eventTypeId</code> и{" "}
-            <code>startAt</code>.
-          </CardDescription>
+          <Badge>Подтверждение</Badge>
+          <CardTitle>Проверьте детали встречи</CardTitle>
+          <CardDescription>Если всё верно, подтвердите бронирование. Время на странице указано в UTC.</CardDescription>
         </CardHeader>
         <CardContent>
           <dl className="summary-list">
             <div className="summary-list__row">
-              <dt>Event type</dt>
+              <dt>ID типа события</dt>
               <dd>
                 <code>{eventTypeId}</code>
               </dd>
@@ -205,9 +277,9 @@ export function BookingConfirmPage() {
       {state.status === "submitting" && (
         <Card className="screen-state">
           <CardHeader>
-            <Badge>Submitting</Badge>
+            <Badge>Отправка</Badge>
             <CardTitle>Отправляем бронирование</CardTitle>
-            <CardDescription>Frontend ждёт ответ backend по текущему выбранному слоту.</CardDescription>
+            <CardDescription>Сохраняем запись и ждём подтверждение от сервиса.</CardDescription>
           </CardHeader>
         </Card>
       )}
@@ -217,7 +289,7 @@ export function BookingConfirmPage() {
           <CardHeader>
             <Badge>409</Badge>
             <CardTitle>Слот уже занят</CardTitle>
-            <CardDescription>Backend вернул контрактную ошибку <code>SLOT_ALREADY_BOOKED</code>.</CardDescription>
+            <CardDescription>Это время уже занято. Вернитесь к слотам и выберите другой интервал.</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="screen-state__message">
@@ -237,9 +309,7 @@ export function BookingConfirmPage() {
           <CardHeader>
             <Badge>422</Badge>
             <CardTitle>Слот больше не проходит правила бронирования</CardTitle>
-            <CardDescription>
-              Backend вернул контрактную ошибку <code>BOOKING_RULE_VIOLATION</code>.
-            </CardDescription>
+            <CardDescription>Текущее время больше недоступно для записи по правилам сервиса.</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="screen-state__message">
@@ -257,11 +327,9 @@ export function BookingConfirmPage() {
       {state.status === "error" && state.slot && (
         <Card className="screen-state">
           <CardHeader>
-            <Badge>Error</Badge>
+            <Badge>Ошибка</Badge>
             <CardTitle>Не удалось создать бронирование</CardTitle>
-            <CardDescription>
-              Backend не подтвердил бронь. Этот сценарий не маппится на специальные 409/422 состояния.
-            </CardDescription>
+            <CardDescription>Сервис не подтвердил запись. Попробуйте выбрать слот заново или повторить попытку позже.</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="screen-state__message">
@@ -279,33 +347,63 @@ export function BookingConfirmPage() {
   );
 }
 
-function getSlotFromLocationState(value: unknown): Slot | null {
+function getSlotFromLocationState(value: unknown): Slot | undefined {
   if (typeof value !== "object" || value === null) {
-    return null;
+    return undefined;
   }
 
   const candidate = value as { slot?: unknown };
 
-  return isSlot(candidate.slot) ? candidate.slot : null;
+  return isSlot(candidate.slot) ? candidate.slot : undefined;
 }
 
-function buildInitialState(eventTypeId: string | undefined, selectedSlot: Slot | null): BookingConfirmState {
+function buildInitialState(
+  eventTypeId: string | undefined,
+  requestedStartAt: string,
+  selectedSlot: Slot | undefined,
+): BookingConfirmState {
   if (!eventTypeId) {
     return {
       status: "error",
-      message: "Event type id is missing in the route",
+      message: "Не удалось определить тип события по текущей ссылке.",
     };
   }
 
-  if (!selectedSlot || selectedSlot.eventTypeId !== eventTypeId) {
+  if (selectedSlot) {
     return {
-      status: "error",
-      message: "Open this screen from the slot selection page to confirm a booking.",
+      status: "idle",
+      slot: selectedSlot,
+    };
+  }
+
+  if (requestedStartAt) {
+    return {
+      status: "resolving",
     };
   }
 
   return {
-    status: "idle",
-    slot: selectedSlot,
+    status: "error",
+    message: "Ссылка не содержит выбранный слот. Вернитесь к списку времени и выберите его заново.",
   };
+}
+
+function getSelectedSlot(
+  slot: Slot | undefined,
+  eventTypeId: string | undefined,
+  requestedStartAt: string,
+): Slot | undefined {
+  if (!slot) {
+    return undefined;
+  }
+
+  if (eventTypeId && slot.eventTypeId !== eventTypeId) {
+    return undefined;
+  }
+
+  if (requestedStartAt && slot.startAt !== requestedStartAt) {
+    return undefined;
+  }
+
+  return slot;
 }

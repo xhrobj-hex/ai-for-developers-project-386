@@ -67,23 +67,20 @@ export function BookEventPage() {
     <section className="screen-grid">
       <Card>
         <CardHeader>
-          <Badge>Маршрут /book/:eventTypeId</Badge>
-          <CardTitle>Свободные слоты</CardTitle>
+          <Badge>Выбор времени</Badge>
+          <CardTitle>Выберите удобный слот</CardTitle>
           <CardDescription>
-            Backend уже отфильтровал доступные слоты для типа события <code>{eventTypeId}</code>. Frontend только
-            показывает то, что пришло по текущему API.
+            Показаны свободные интервалы для выбранного типа события. Все времена на этой странице указаны в UTC.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <ul className="screen-list">
-            <li>
-              Источник данных: контрактный <code>GET /event-types/{"{eventTypeId}"}/slots</code>.
-            </li>
-            <li>Слоты сгруппированы по дате.</li>
-            <li>Клиент не вычисляет слоты самостоятельно.</li>
+            <li>Доступны только ближайшие 14 дней.</li>
+            <li>После выбора времени откроется экран подтверждения.</li>
+            <li>Если слот занят, сервис предложит выбрать другой.</li>
           </ul>
           <div className="slot-rules">
-            <p className="slot-rules__title">Текущие operational rules MVP</p>
+            <p className="slot-rules__title">Правила текущей версии</p>
             <ul className="screen-list">
               <li>Доступны только ближайшие 14 дней.</li>
               <li>Окно показа: 09:00–18:00 UTC.</li>
@@ -101,9 +98,9 @@ export function BookEventPage() {
       {state.status === "loading" && (
         <Card className="screen-state">
           <CardHeader>
-            <Badge>Loading</Badge>
+            <Badge>Загрузка</Badge>
             <CardTitle>Загружаем свободные слоты</CardTitle>
-            <CardDescription>Frontend запрашивает доступные интервалы у backend для выбранного типа события.</CardDescription>
+            <CardDescription>Подбираем доступные интервалы для выбранной встречи.</CardDescription>
           </CardHeader>
         </Card>
       )}
@@ -111,16 +108,19 @@ export function BookEventPage() {
       {state.status === "error" && (
         <Card className="screen-state">
           <CardHeader>
-            <Badge>Error</Badge>
+            <Badge>Ошибка</Badge>
             <CardTitle>Не удалось загрузить свободные слоты</CardTitle>
-            <CardDescription>
-              Проверьте, что `eventTypeId` существует и backend доступен через текущий frontend API client.
-            </CardDescription>
+            <CardDescription>Попробуйте открыть страницу ещё раз или вернитесь к списку доступных встреч.</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="screen-state__message">
               Детали: <code>{state.message}</code>
             </p>
+            <div className="screen-actions">
+              <Link className={cn("ui-button", "ui-button--ghost")} to="/">
+                На главную
+              </Link>
+            </div>
           </CardContent>
         </Card>
       )}
@@ -128,12 +128,17 @@ export function BookEventPage() {
       {state.status === "success" && state.slots.length === 0 && (
         <Card className="screen-state">
           <CardHeader>
-            <Badge>Empty</Badge>
-            <CardTitle>Свободных слотов пока нет</CardTitle>
-            <CardDescription>
-              Backend вернул пустой список по <code>GET /event-types/{"{eventTypeId}"}/slots</code>.
-            </CardDescription>
+            <Badge>Пусто</Badge>
+            <CardTitle>На ближайшие 14 дней свободных слотов нет</CardTitle>
+            <CardDescription>Вернитесь к списку встреч или попробуйте проверить страницу позже.</CardDescription>
           </CardHeader>
+          <CardContent>
+            <div className="screen-actions">
+              <Link className={cn("ui-button", "ui-button--ghost")} to="/">
+                К списку встреч
+              </Link>
+            </div>
+          </CardContent>
         </Card>
       )}
 
@@ -153,7 +158,7 @@ export function BookEventPage() {
                       key={`${slot.eventTypeId}-${slot.startAt}`}
                       className={cn("slot-pill", "slot-pill--interactive")}
                       data-testid="slot-option"
-                      to={`/book/${eventTypeId}/confirm`}
+                      to={`/book/${slot.eventTypeId}/confirm?startAt=${encodeURIComponent(slot.startAt)}`}
                       state={{ slot }}
                     >
                       <span>{formatUtcTime(slot.startAt)}</span>

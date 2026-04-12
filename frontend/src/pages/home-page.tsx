@@ -43,17 +43,17 @@ export function HomePage() {
     <section className="screen-grid">
       <Card>
         <CardHeader>
-          <Badge>Маршрут /</Badge>
-          <CardTitle>Публичная запись</CardTitle>
+          <Badge>Публичная запись</Badge>
+          <CardTitle>Выберите тип встречи</CardTitle>
           <CardDescription>
-            Гость видит доступные типы событий из backend и выбирает, с какого сценария записи начать.
+            Это публичная страница записи. Гость начинает сценарий с выбора подходящего формата встречи.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <ul className="screen-list">
-            <li>Источник данных: контрактный `GET /event-types`.</li>
-            <li>Список типов событий уже загружается из backend.</li>
-            <li>Переход ведёт на реальный экран свободных слотов.</li>
+            <li>Выберите подходящий тип встречи.</li>
+            <li>Откройте свободные слоты на ближайшие 14 дней.</li>
+            <li>Подтвердите бронирование на следующем шаге.</li>
           </ul>
         </CardContent>
       </Card>
@@ -61,9 +61,9 @@ export function HomePage() {
       {state.status === "loading" && (
         <Card className="screen-state">
           <CardHeader>
-            <Badge>Loading</Badge>
-            <CardTitle>Загружаем типы событий</CardTitle>
-            <CardDescription>Frontend запрашивает список доступных event types у backend.</CardDescription>
+            <Badge>Загрузка</Badge>
+            <CardTitle>Загружаем доступные встречи</CardTitle>
+            <CardDescription>Получаем список типов событий для публичной записи.</CardDescription>
           </CardHeader>
         </Card>
       )}
@@ -71,11 +71,9 @@ export function HomePage() {
       {state.status === "error" && (
         <Card className="screen-state">
           <CardHeader>
-            <Badge>Error</Badge>
-            <CardTitle>Не удалось загрузить список типов событий</CardTitle>
-            <CardDescription>
-              Проверьте `VITE_API_BASE_URL`, доступность backend и разрешение браузерных запросов к API.
-            </CardDescription>
+            <Badge>Ошибка</Badge>
+            <CardTitle>Не удалось открыть список встреч</CardTitle>
+            <CardDescription>Сервис временно недоступен. Попробуйте обновить страницу или проверьте доступность API.</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="screen-state__message">
@@ -88,12 +86,17 @@ export function HomePage() {
       {state.status === "success" && state.eventTypes.length === 0 && (
         <Card className="screen-state">
           <CardHeader>
-            <Badge>Empty</Badge>
-            <CardTitle>Типы событий пока не созданы</CardTitle>
-            <CardDescription>
-              Публичная страница готова, но backend пока возвращает пустой список `GET /event-types`.
-            </CardDescription>
+            <Badge>Пусто</Badge>
+            <CardTitle>Пока нет доступных встреч</CardTitle>
+            <CardDescription>Сначала создайте хотя бы один тип события в панели владельца.</CardDescription>
           </CardHeader>
+          <CardContent>
+            <div className="screen-actions">
+              <Link className={cn("ui-button", "ui-button--primary")} to="/admin">
+                Открыть панель владельца
+              </Link>
+            </div>
+          </CardContent>
         </Card>
       )}
 
@@ -109,14 +112,14 @@ export function HomePage() {
               <CardContent>
                 <div className="event-type-card__meta">
                   <span>Длительность: {formatDuration(eventType.durationMinutes)}</span>
-                  <span>Переход ведёт на выбор слотов</span>
+                  <span>Следующий шаг: выбор времени</span>
                 </div>
                 <Link
                   className={cn("ui-button", "ui-button--primary", "screen-action")}
                   data-testid="event-type-open"
                   to={`/book/${eventType.id}`}
                 >
-                  Выбрать тип события
+                  Выбрать время
                 </Link>
               </CardContent>
             </Card>

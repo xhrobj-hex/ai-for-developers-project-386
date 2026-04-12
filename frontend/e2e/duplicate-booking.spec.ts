@@ -34,7 +34,8 @@ test("second attempt to book the same slot gets a slot conflict", async ({ brows
 
     await secondPage.getByTestId("booking-submit").click();
     await expect(secondPage.getByTestId("booking-slot-conflict")).toBeVisible();
-    await expect(secondPage.getByTestId("booking-slot-conflict")).toContainText("SLOT_ALREADY_BOOKED");
+    await expect(secondPage.getByTestId("booking-slot-conflict")).toContainText("Слот уже занят");
+    await expect(secondPage.getByTestId("booking-slot-conflict")).toContainText("Выбрать другой слот");
   } finally {
     await secondContext.close();
   }

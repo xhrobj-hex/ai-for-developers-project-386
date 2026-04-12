@@ -132,12 +132,9 @@ export function AdminPage() {
     <section className="screen-grid screen-grid--admin">
       <Card>
         <CardHeader>
-          <Badge>Маршрут /admin</Badge>
+          <Badge>Панель владельца</Badge>
           <CardTitle>Создание типа события</CardTitle>
-          <CardDescription>
-            Форма отправляет только контрактный <code>POST /admin/event-types</code> и после успеха остаётся готовой к
-            следующему созданию.
-          </CardDescription>
+          <CardDescription>Создайте тип встречи, который появится на публичной странице записи.</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="admin-form" data-testid="event-type-form" onSubmit={handleSubmit}>
@@ -187,15 +184,19 @@ export function AdminPage() {
           </form>
 
           {createState.status === "idle" && (
-            <p className="admin-inline-note">Состояние формы: idle. Можно создать новый тип события.</p>
+            <p className="admin-inline-note">Заполните форму и создайте новый тип события для гостевого сценария.</p>
           )}
 
           {createState.status === "success" && (
             <div className="admin-feedback admin-feedback--success" data-testid="event-type-success">
               <p className="admin-feedback__title">Тип события создан</p>
               <p className="admin-feedback__text">
-                ID: <code>{createState.eventType.id}</code>, название: <strong>{createState.eventType.name}</strong>,{" "}
-                длительность: {createState.eventType.durationMinutes} мин.
+                Название: <strong>{createState.eventType.name}</strong>
+              </p>
+              <p className="admin-feedback__text">Описание: {createState.eventType.description}</p>
+              <p className="admin-feedback__text">Длительность: {createState.eventType.durationMinutes} мин.</p>
+              <p className="admin-feedback__text">
+                ID: <code>{createState.eventType.id}</code>
               </p>
             </div>
           )}
@@ -215,28 +216,26 @@ export function AdminPage() {
         <CardHeader>
           <Badge>Owner flow</Badge>
           <CardTitle>Предстоящие записи</CardTitle>
-          <CardDescription>
-            Блок только читает данные из контрактного <code>GET /admin/bookings/upcoming</code> без клиентских вычислений.
-          </CardDescription>
+          <CardDescription>Здесь владелец видит все будущие бронирования, созданные в публичном сценарии.</CardDescription>
         </CardHeader>
         <CardContent data-testid="upcoming-bookings">
           {upcomingState.status === "loading" && (
             <div className="admin-feedback">
-              <p className="admin-feedback__title">Loading</p>
+              <p className="admin-feedback__title">Загрузка</p>
               <p className="admin-feedback__text">Загружаем предстоящие записи владельца.</p>
             </div>
           )}
 
           {upcomingState.status === "empty" && (
             <div className="admin-feedback">
-              <p className="admin-feedback__title">Empty</p>
-              <p className="admin-feedback__text">Backend пока не вернул ни одной предстоящей записи.</p>
+              <p className="admin-feedback__title">Пусто</p>
+              <p className="admin-feedback__text">Предстоящих бронирований пока нет.</p>
             </div>
           )}
 
           {upcomingState.status === "error" && (
             <div className="admin-feedback admin-feedback--error">
-              <p className="admin-feedback__title">Error</p>
+              <p className="admin-feedback__title">Ошибка</p>
               <p className="admin-feedback__text">
                 <code>{upcomingState.message}</code>
               </p>

@@ -1,147 +1,122 @@
 # Календарь звонков
 
-Учебный проект курса Hexlet AI for Developers: упрощённый сервис бронирования временных слотов по мотивам Cal.com. Проект развивается по подходу Design First: сначала контракт в TypeSpec и OpenAPI, затем технический каркас, backend и frontend.
+Учебный проект курса Hexlet AI for Developers: упрощённый сервис бронирования временных слотов по мотивам Cal.com.
 
-## Публичный деплой
+Проект собран по подходу Design First: сначала контракт в TypeSpec/OpenAPI, затем backend, frontend, e2e, CI, Docker и публичный deploy.
 
-Приложение развёрнуто в Render и доступно по адресу: `https://xhrobj-ai-cal-386.onrender.com`
+## Демо
 
-Публичный health-check: `https://xhrobj-ai-cal-386.onrender.com/health`
+- Приложение: `https://xhrobj-ai-cal-386.onrender.com`
+- Health-check: `https://xhrobj-ai-cal-386.onrender.com/health`
 
-## Структура репозитория
+## Основной сценарий
 
-- `backend/` — backend на Go с in-memory хранением и реализацией MVP endpoint'ов по контракту.
-- `frontend/` — минимальный frontend на React + TypeScript + Vite.
-- `contracts/typespec/` — контракт API в TypeSpec.
-- `contracts/openapi/` — сгенерированная OpenAPI-спека.
-- `docs/` — зафиксированные решения по MVP, домену и этапам проекта.
+1. Владелец открывает `/admin` и создаёт тип встречи.
+2. Гость открывает `/`, выбирает тип встречи и свободный слот.
+3. Гость подтверждает бронирование.
+4. Владелец возвращается в `/admin` и видит новую запись в списке предстоящих встреч.
 
-## Запуск backend
+## Что есть в текущей версии
+
+- один заранее заданный владелец календаря;
+- публичная страница записи со списком типов встреч;
+- выбор свободных слотов на ближайшие 14 дней;
+- создание бронирования на свободное время;
+- защита от двойного бронирования одного и того же слота;
+- owner-панель с созданием event type и просмотром upcoming bookings;
+- Playwright e2e, CI, Docker и deploy в Render.
+
+## Стек
+
+- backend: Go, in-memory store;
+- frontend: React 19, TypeScript, Vite, React Router;
+- контракт: TypeSpec + OpenAPI;
+- проверки: Go tests, Playwright e2e, GitHub Actions CI;
+- доставка: Docker + Render.
+
+## Локальный запуск
+
+Требования:
+
+- Go `1.26`;
+- Node.js и npm;
+
+Установка зависимостей:
+
+```bash
+npm install
+npm --prefix frontend install
+```
+
+Запуск backend:
 
 ```bash
 cd backend
 go run ./cmd/api
 ```
 
-По умолчанию backend стартует на `http://localhost:8080`. Порт можно переопределить переменной `PORT`:
+По умолчанию backend доступен на `http://localhost:8080`.
 
-```bash
-cd backend
-PORT=8090 go run ./cmd/api
-```
-
-Health-check: `GET http://localhost:8080/health`
-
-Реализованные backend endpoint'ы:
-
-- `GET /health`
-- `GET /event-types`
-- `GET /event-types/{eventTypeId}/slots`
-- `POST /bookings`
-- `POST /admin/event-types`
-- `GET /admin/bookings/upcoming`
-
-Данные backend хранятся только in-memory и сбрасываются после рестарта процесса.
-
-Текущие backend MVP-допущения, которые используются в реализации, но не являются частью контракта:
-
-- слоты генерируются только на ближайшие 14 дней;
-- рабочее окно: каждый день с `09:00` до `18:00`;
-- шаг сетки слотов: `30 минут`;
-- все расчёты времени выполняются в `UTC`.
-
-## Запуск frontend
+Запуск frontend:
 
 ```bash
 cd frontend
-npm install
 npm run dev -- --host 127.0.0.1 --port 5173
-```
-
-После запуска открой `http://127.0.0.1:5173/`.
-
-В dev-режиме frontend обращается к backend через Vite proxy `/api`, поэтому для локальной проверки backend должен быть запущен на `http://localhost:8080`.
-
-Для frontend подготовлен локальный пример переменных: `frontend/.env.example`. Сейчас в нём только `VITE_API_BASE_URL=http://localhost:8080`; это значение нужно для build/production-конфига, а не для локального dev proxy.
-
-## E2E Playwright
-
-Локальная последовательность для e2e:
-
-```bash
-npm run test:e2e:setup
-npm run test:e2e
-```
-
-`npm run test:e2e:setup` нужен только для одноразовой локальной установки Chromium. После этого обычно достаточно:
-
-```bash
-npm run test:e2e
-```
-
-Команда `npm run test:e2e` поднимает отдельный backend на `http://127.0.0.1:18080`, запускает отдельный frontend dev server на `http://127.0.0.1:14173` и прогоняет e2e против реального UI и backend. Это не конфликтует с обычным локальным запуском на `8080` и `5173`.
-
-## CI
-
-Для проекта добавлен отдельный workflow `ci.yml`, который запускается автоматически на `push` и `pull_request`.
-
-В CI выполняются:
-
-- проверка TypeSpec/OpenAPI на актуальность;
-- backend-проверки через `go test ./...`;
-- frontend build через `npm ci --prefix frontend` и `npm run build`;
-- Playwright e2e через `npm run test:e2e`.
-
-`hexlet-check.yml` остаётся отдельным служебным workflow Hexlet и не заменяется этим CI.
-
-После успешных CI-job'ов отдельно запускается SonarQube Cloud analysis. Этот шаг пока неблокирующий: он не используется как quality gate для падения всего workflow.
-
-## Docker
-
-Для проекта используется один корневой `Dockerfile`: внутри одного контейнера собираются backend и frontend, backend запускается в фоне, а `nginx` раздаёт frontend и проксирует `/api` на внутренний backend.
-
-Локальный контейнерный запуск воспроизводим одной командой и проверен на переменной окружения `PORT`.
-
-Сборка образа:
-
-```bash
-docker build -t calendar-booking .
-```
-
-Запуск контейнера:
-
-```bash
-docker run --rm -e PORT=8080 -p 8080:8080 calendar-booking
 ```
 
 После старта:
 
-- frontend: `http://localhost:8080/`
-- backend health: `http://localhost:8080/health`
+- публичный интерфейс: `http://127.0.0.1:5173/`
+- owner-панель: `http://127.0.0.1:5173/admin`
+- локальный health-check backend: `http://localhost:8080/health`
+
+В dev-режиме frontend ходит в backend через Vite proxy `/api`, поэтому backend должен быть запущен отдельно на `http://localhost:8080`.
+
+## Docker
+
+Проект можно поднять одним контейнером:
+
+```bash
+docker build -t calendar-booking .
+docker run --rm -e PORT=8080 -p 8080:8080 calendar-booking
+```
+
+После старта контейнера:
+
+- приложение: `http://localhost:8080/`
+- health-check: `http://localhost:8080/health`
 - backend через frontend proxy: `http://localhost:8080/api/health`
 
-Frontend в образе собирается как production build с `VITE_API_BASE_URL=/api`, поэтому браузер работает через same-origin `/api` и отдельный CORS для этого сценария не нужен.
+## Проверки
 
-Данные backend по-прежнему хранятся только in-memory и после рестарта контейнера сбрасываются.
+Контракт, backend, frontend и e2e проверяются отдельными командами:
 
-## Что уже готово
+```bash
+npm run check:contracts
+npm run check:backend
+npm run check:frontend
+npm run test:e2e
+```
 
-- собрана верхнеуровневая структура репозитория;
-- контракт хранится в `contracts/`;
-- backend MVP реализует основной API-сценарий на Go с in-memory хранением;
-- frontend MVP на React + TypeScript + Vite подключён к backend API;
-- публичный сценарий работает через `/` -> `/book/:eventTypeId` -> `/book/:eventTypeId/confirm`;
-- owner-часть работает через `/admin`: создание event type и просмотр upcoming bookings.
-- Playwright e2e покрывает happy path, duplicate booking и invalid owner form submit.
-- GitHub Actions CI запускает контракты, backend, frontend build и e2e на `push` и `pull_request`.
-- SonarQube Cloud подключён к CI в режиме CI-based analysis.
-- Локальный запуск в Docker воспроизводим через один корневой `Dockerfile` и один контейнер.
-- Деплой в Render выполнен и подтверждён на публичном URL `https://xhrobj-ai-cal-386.onrender.com`.
+`npm run test:e2e:setup` нужен только для одноразовой локальной установки Chromium для Playwright.
 
-## Что пока не реализовано
+## Ограничения текущей версии
 
-- авторизация и защита `/admin`;
-- редактирование и удаление event type;
+- нет авторизации и защиты `/admin`;
+- нет multi-owner режима;
+- нет интеграций с внешними календарями;
+- нет редактирования и удаления event type;
+- данные хранятся только in-memory и сбрасываются после рестарта;
+- окно записи ограничено ближайшими 14 днями;
+- все расчёты времени выполняются в `UTC`.
+
+## Структура репозитория
+
+- `backend/` — backend на Go;
+- `frontend/` — пользовательский интерфейс на React + TypeScript;
+- `contracts/typespec/` — контракт API в TypeSpec;
+- `contracts/openapi/` — сгенерированная OpenAPI-спека;
+- `docs/` — зафиксированные решения по MVP, домену и этапам проекта.
 
 ---
 
