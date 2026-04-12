@@ -239,6 +239,7 @@ export function AdminPage() {
                     <strong>{booking.eventTypeName}</strong>
                     <span className="admin-list__eyebrow">{formatUtcDateTime(booking.startAt)} UTC</span>
                   </div>
+                  <p className="admin-list__description">{booking.eventTypeDescription}</p>
                   <dl className="summary-list">
                     <div className="summary-list__row">
                       <dt>Начало</dt>

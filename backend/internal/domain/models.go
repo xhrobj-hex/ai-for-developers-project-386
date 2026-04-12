@@ -25,10 +25,11 @@ type Slot struct {
 }
 
 type UpcomingBooking struct {
-	ID            string    `json:"id"`
-	EventTypeID   string    `json:"eventTypeId"`
-	EventTypeName string    `json:"eventTypeName"`
-	StartAt       time.Time `json:"startAt"`
-	EndAt         time.Time `json:"endAt"`
-	CreatedAt     time.Time `json:"createdAt"`
+	ID                   string    `json:"id"`
+	EventTypeID          string    `json:"eventTypeId"`
+	EventTypeName        string    `json:"eventTypeName"`
+	EventTypeDescription string    `json:"eventTypeDescription"`
+	StartAt              time.Time `json:"startAt"`
+	EndAt                time.Time `json:"endAt"`
+	CreatedAt            time.Time `json:"createdAt"`
 }

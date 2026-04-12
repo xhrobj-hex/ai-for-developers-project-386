@@ -392,6 +392,16 @@ h1 {
   font-size: 0.92rem;
 }
 
+.admin-list__description {
+  display: -webkit-box;
+  margin: -4px 0 0;
+  overflow: hidden;
+  color: var(--text-muted);
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
 .summary-list {
   display: grid;
   gap: 12px;

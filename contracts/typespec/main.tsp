@@ -47,6 +47,7 @@ model UpcomingBooking {
   id: string;
   eventTypeId: string;
   eventTypeName: string;
+  eventTypeDescription: string;
   startAt: utcDateTime;
   endAt: utcDateTime;
   createdAt: utcDateTime;

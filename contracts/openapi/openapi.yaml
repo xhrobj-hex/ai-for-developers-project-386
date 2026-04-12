@@ -272,6 +272,7 @@ components:
         - id
         - eventTypeId
         - eventTypeName
+        - eventTypeDescription
         - startAt
         - endAt
         - createdAt
@@ -281,6 +282,8 @@ components:
         eventTypeId:
           type: string
         eventTypeName:
+          type: string
+        eventTypeDescription:
           type: string
         startAt:
           type: string

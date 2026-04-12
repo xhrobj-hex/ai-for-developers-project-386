@@ -117,20 +117,31 @@ func (h *Handler) listUpcomingBookings(w http.ResponseWriter, r *http.Request) {
 	bookings := h.store.ListUpcomingBookings(now)
 	eventTypes := h.store.ListEventTypes()
 
-	eventTypeNames := make(map[string]string, len(eventTypes))
+	type eventTypeDetails struct {
+		name        string
+		description string
+	}
+
+	eventTypeByID := make(map[string]eventTypeDetails, len(eventTypes))
 	for _, eventType := range eventTypes {
-		eventTypeNames[eventType.ID] = eventType.Name
+		eventTypeByID[eventType.ID] = eventTypeDetails{
+			name:        eventType.Name,
+			description: eventType.Description,
+		}
 	}
 
 	response := make([]domain.UpcomingBooking, 0, len(bookings))
 	for _, booking := range bookings {
+		eventType := eventTypeByID[booking.EventTypeID]
+
 		response = append(response, domain.UpcomingBooking{
-			ID:            booking.ID,
-			EventTypeID:   booking.EventTypeID,
-			EventTypeName: eventTypeNames[booking.EventTypeID],
-			StartAt:       booking.StartAt,
-			EndAt:         booking.EndAt,
-			CreatedAt:     booking.CreatedAt,
+			ID:                   booking.ID,
+			EventTypeID:          booking.EventTypeID,
+			EventTypeName:        eventType.name,
+			EventTypeDescription: eventType.description,
+			StartAt:              booking.StartAt,
+			EndAt:                booking.EndAt,
+			CreatedAt:            booking.CreatedAt,
 		})
 	}
 

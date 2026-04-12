@@ -38,4 +38,5 @@ test("owner creates an event type, guest books a slot, owner sees upcoming booki
 
   const upcomingItem = page.getByTestId("upcoming-booking-item").filter({ hasText: eventTypeName });
   await expect(upcomingItem).toBeVisible();
+  await expect(upcomingItem).toContainText(eventTypeDescription);
 });
