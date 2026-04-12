@@ -13,11 +13,19 @@ test("booking confirm page restores selected slot from deep link", async ({ page
   expect(slots.length).toBeGreaterThan(0);
 
   const selectedSlot = slots[0];
+  const displayedStart = new Intl.DateTimeFormat("ru-RU", {
+    timeZone: "UTC",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(selectedSlot.startAt));
 
   await page.goto(`/book/${eventType.id}/confirm?startAt=${encodeURIComponent(selectedSlot.startAt)}`);
 
   await expect(page.getByTestId("booking-confirm")).toBeVisible();
-  await expect(page.getByTestId("booking-confirm")).toContainText(eventType.id);
+  await expect(page.getByTestId("booking-confirm")).toContainText(displayedStart);
 
   await page.getByTestId("booking-submit").click();
   await expect(page.getByTestId("booking-success")).toBeVisible();

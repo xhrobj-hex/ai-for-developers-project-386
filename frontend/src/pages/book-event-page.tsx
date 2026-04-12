@@ -26,7 +26,7 @@ export function BookEventPage() {
     if (!eventTypeId) {
       setState({
         status: "error",
-        message: "Event type id is missing in the route",
+        message: "Не удалось открыть страницу встречи.",
       });
       return;
     }
@@ -39,14 +39,14 @@ export function BookEventPage() {
       .then((slots) => {
         setState({ status: "success", slots });
       })
-      .catch((error: unknown) => {
+      .catch(() => {
         if (controller.signal.aborted) {
           return;
         }
 
         setState({
           status: "error",
-          message: error instanceof Error ? error.message : "Unknown error",
+          message: "Попробуйте открыть страницу ещё раз.",
         });
       });
 
@@ -65,31 +65,16 @@ export function BookEventPage() {
 
   return (
     <section className="screen-grid">
-      <Card>
-        <CardHeader>
-          <Badge>Выбор времени</Badge>
+      <Card className="hero-card">
+        <CardHeader className="hero-card__header">
           <CardTitle>Выберите удобный слот</CardTitle>
-          <CardDescription>
-            Показаны свободные интервалы для выбранного типа события. Все времена на этой странице указаны в UTC.
-          </CardDescription>
+          <CardDescription>Показываем ближайшие свободные интервалы. Все времена на странице указаны в UTC.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <ul className="screen-list">
-            <li>Доступны только ближайшие 14 дней.</li>
-            <li>После выбора времени откроется экран подтверждения.</li>
-            <li>Если слот занят, сервис предложит выбрать другой.</li>
-          </ul>
-          <div className="slot-rules">
-            <p className="slot-rules__title">Правила текущей версии</p>
-            <ul className="screen-list">
-              <li>Доступны только ближайшие 14 дней.</li>
-              <li>Окно показа: 09:00–18:00 UTC.</li>
-              <li>Шаг сетки: 30 минут.</li>
-            </ul>
-          </div>
+        <CardContent className="hero-card__content hero-card__content--inline">
+          <p className="screen-note">После выбора времени останется только подтвердить запись.</p>
           <div className="screen-actions">
             <Link className={cn("ui-button", "ui-button--ghost")} to="/">
-              Назад к типам событий
+              К списку встреч
             </Link>
           </div>
         </CardContent>
@@ -98,9 +83,8 @@ export function BookEventPage() {
       {state.status === "loading" && (
         <Card className="screen-state">
           <CardHeader>
-            <Badge>Загрузка</Badge>
             <CardTitle>Загружаем свободные слоты</CardTitle>
-            <CardDescription>Подбираем доступные интервалы для выбранной встречи.</CardDescription>
+            <CardDescription>Подбираем доступное время для этой встречи.</CardDescription>
           </CardHeader>
         </Card>
       )}
@@ -108,14 +92,10 @@ export function BookEventPage() {
       {state.status === "error" && (
         <Card className="screen-state">
           <CardHeader>
-            <Badge>Ошибка</Badge>
             <CardTitle>Не удалось загрузить свободные слоты</CardTitle>
-            <CardDescription>Попробуйте открыть страницу ещё раз или вернитесь к списку доступных встреч.</CardDescription>
+            <CardDescription>{state.message}</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="screen-state__message">
-              Детали: <code>{state.message}</code>
-            </p>
             <div className="screen-actions">
               <Link className={cn("ui-button", "ui-button--ghost")} to="/">
                 На главную
@@ -128,9 +108,8 @@ export function BookEventPage() {
       {state.status === "success" && state.slots.length === 0 && (
         <Card className="screen-state">
           <CardHeader>
-            <Badge>Пусто</Badge>
-            <CardTitle>На ближайшие 14 дней свободных слотов нет</CardTitle>
-            <CardDescription>Вернитесь к списку встреч или попробуйте проверить страницу позже.</CardDescription>
+            <CardTitle>Свободного времени пока нет</CardTitle>
+            <CardDescription>Попробуйте вернуться позже или выберите другой формат встречи.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="screen-actions">
@@ -145,11 +124,13 @@ export function BookEventPage() {
       {state.status === "success" && state.slots.length > 0 && (
         <div className="slot-group-list">
           {groupedSlots.map((group) => (
-            <Card key={group.dateKey} data-testid="slot-group">
+            <Card key={group.dateKey} className="slot-group-card" data-testid="slot-group">
               <CardHeader>
-                <Badge>{group.slots.length} слотов</Badge>
-                <CardTitle>{group.label}</CardTitle>
-                <CardDescription>Все времена показаны в UTC.</CardDescription>
+                <div className="slot-group-card__top">
+                  <CardTitle>{group.label}</CardTitle>
+                  <Badge>{group.slots.length} слотов</Badge>
+                </div>
+                <CardDescription>Свободные интервалы в UTC.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="slot-grid">

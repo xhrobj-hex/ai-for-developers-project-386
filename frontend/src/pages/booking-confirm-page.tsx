@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { createBooking, isApiErrorWithCode } from "@/lib/api/bookings";
 import { listEventTypeSlots } from "@/lib/api/slots";
-import { formatUtcDateTime } from "@/lib/format/utc";
+import { formatUtcDateTime, formatUtcTime } from "@/lib/format/utc";
 import type { Booking } from "@/lib/types/booking";
 import { isSlot, type Slot } from "@/lib/types/slot";
 import { cn } from "@/lib/utils";
@@ -37,7 +36,7 @@ export function BookingConfirmPage() {
     if (!eventTypeId) {
       setState({
         status: "error",
-        message: "Не удалось определить тип события по текущей ссылке.",
+        message: "Не удалось определить тип встречи по текущей ссылке.",
       });
       return;
     }
@@ -75,15 +74,14 @@ export function BookingConfirmPage() {
           slot: resolvedSlot,
         });
       })
-      .catch((error: unknown) => {
+      .catch(() => {
         if (controller.signal.aborted) {
           return;
         }
 
         setState({
           status: "error",
-          message:
-            error instanceof Error ? error.message : "Не удалось восстановить выбранный слот по текущей ссылке.",
+          message: "Не удалось проверить выбранное время. Вернитесь к слотам и выберите его заново.",
         });
       });
 
@@ -139,7 +137,7 @@ export function BookingConfirmPage() {
       setState({
         status: "error",
         slot: activeSlot,
-        message: error instanceof Error ? error.message : "Unknown error",
+        message: "Сервис временно недоступен. Попробуйте ещё раз чуть позже.",
       });
     }
   }
@@ -149,14 +147,11 @@ export function BookingConfirmPage() {
       <section className="screen-grid">
         <Card className="screen-state" data-testid="booking-missing-slot">
           <CardHeader>
-            <Badge>Ошибка</Badge>
             <CardTitle>Не удалось открыть подтверждение</CardTitle>
-            <CardDescription>Ссылка не содержит корректный слот или выбранное время уже недоступно.</CardDescription>
+            <CardDescription>Похоже, ссылка устарела или выбранное время уже недоступно.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="screen-state__message">
-              Детали: <code>{state.message}</code>
-            </p>
+            <p className="screen-note screen-note--muted">{state.message}</p>
             <div className="screen-actions">
               {canReturnToSlots && (
                 <Link className={cn("ui-button", "ui-button--primary")} to={`/book/${eventTypeId}`}>
@@ -164,7 +159,7 @@ export function BookingConfirmPage() {
                 </Link>
               )}
               <Link className={cn("ui-button", "ui-button--ghost")} to="/">
-                На главную
+                К списку встреч
               </Link>
             </div>
           </CardContent>
@@ -178,9 +173,8 @@ export function BookingConfirmPage() {
       <section className="screen-grid">
         <Card className="screen-state" data-testid="booking-resolving-slot">
           <CardHeader>
-            <Badge>Загрузка</Badge>
-            <CardTitle>Восстанавливаем выбранный слот</CardTitle>
-            <CardDescription>Проверяем, что время из ссылки всё ещё доступно для бронирования.</CardDescription>
+            <CardTitle>Проверяем выбранное время</CardTitle>
+            <CardDescription>Убеждаемся, что слот из ссылки всё ещё доступен.</CardDescription>
           </CardHeader>
         </Card>
       </section>
@@ -192,39 +186,21 @@ export function BookingConfirmPage() {
       <section className="screen-grid">
         <Card className="screen-state" data-testid="booking-success">
           <CardHeader>
-            <Badge>Готово</Badge>
             <CardTitle>Запись подтверждена</CardTitle>
-            <CardDescription>Встреча успешно создана. Ниже показаны детали подтверждённого бронирования.</CardDescription>
+            <CardDescription>Встреча сохранена. Выбранное время указано ниже.</CardDescription>
           </CardHeader>
           <CardContent>
-            <dl className="summary-list">
-              <div className="summary-list__row">
-                <dt>ID бронирования</dt>
-                <dd>
-                  <code>{state.booking.id}</code>
-                </dd>
-              </div>
-              <div className="summary-list__row">
-                <dt>ID типа события</dt>
-                <dd>
-                  <code>{state.booking.eventTypeId}</code>
-                </dd>
-              </div>
-              <div className="summary-list__row">
-                <dt>Начало</dt>
-                <dd>{formatUtcDateTime(state.booking.startAt)} UTC</dd>
-              </div>
-              <div className="summary-list__row">
-                <dt>Конец</dt>
-                <dd>{formatUtcDateTime(state.booking.endAt)} UTC</dd>
-              </div>
-            </dl>
+            <div className="booking-highlight">
+              <p className="booking-highlight__label">Выбранное время</p>
+              <p className="booking-highlight__value">{formatUtcDateTime(state.booking.startAt)} UTC</p>
+              <p className="booking-highlight__caption">До {formatUtcTime(state.booking.endAt)} UTC</p>
+            </div>
             <div className="screen-actions">
               <Link className={cn("ui-button", "ui-button--ghost")} to={`/book/${state.booking.eventTypeId}`}>
-                Назад к слотам
+                Выбрать другой слот
               </Link>
               <Link className={cn("ui-button", "ui-button--primary")} to="/">
-                На главную
+                К списку встреч
               </Link>
             </div>
           </CardContent>
@@ -240,35 +216,23 @@ export function BookingConfirmPage() {
 
   return (
     <section className="screen-grid">
-      <Card data-testid="booking-confirm">
+      <Card className="hero-card" data-testid="booking-confirm">
         <CardHeader>
-          <Badge>Подтверждение</Badge>
-          <CardTitle>Проверьте детали встречи</CardTitle>
-          <CardDescription>Если всё верно, подтвердите бронирование. Время на странице указано в UTC.</CardDescription>
+          <CardTitle>Подтвердите запись</CardTitle>
+          <CardDescription>Проверьте выбранное время и завершите бронирование. Все времена на странице указаны в UTC.</CardDescription>
         </CardHeader>
         <CardContent>
-          <dl className="summary-list">
-            <div className="summary-list__row">
-              <dt>ID типа события</dt>
-              <dd>
-                <code>{eventTypeId}</code>
-              </dd>
-            </div>
-            <div className="summary-list__row">
-              <dt>Начало</dt>
-              <dd>{formatUtcDateTime(activeSlot.startAt)} UTC</dd>
-            </div>
-            <div className="summary-list__row">
-              <dt>Конец</dt>
-              <dd>{formatUtcDateTime(activeSlot.endAt)} UTC</dd>
-            </div>
-          </dl>
+          <div className="booking-highlight">
+            <p className="booking-highlight__label">Выбранное время</p>
+            <p className="booking-highlight__value">{formatUtcDateTime(activeSlot.startAt)} UTC</p>
+            <p className="booking-highlight__caption">До {formatUtcTime(activeSlot.endAt)} UTC</p>
+          </div>
           <div className="screen-actions">
             <Link className={cn("ui-button", "ui-button--ghost")} to={`/book/${eventTypeId}`}>
-              Назад к слотам
+              Вернуться к слотам
             </Link>
             <Button data-testid="booking-submit" onClick={handleSubmit} disabled={state.status === "submitting"}>
-              {state.status === "submitting" ? "Создаём бронирование..." : "Подтвердить бронирование"}
+              {state.status === "submitting" ? "Подтверждаем..." : "Подтвердить запись"}
             </Button>
           </div>
         </CardContent>
@@ -277,9 +241,8 @@ export function BookingConfirmPage() {
       {state.status === "submitting" && (
         <Card className="screen-state">
           <CardHeader>
-            <Badge>Отправка</Badge>
-            <CardTitle>Отправляем бронирование</CardTitle>
-            <CardDescription>Сохраняем запись и ждём подтверждение от сервиса.</CardDescription>
+            <CardTitle>Подтверждаем запись</CardTitle>
+            <CardDescription>Это займёт всего несколько секунд.</CardDescription>
           </CardHeader>
         </Card>
       )}
@@ -287,14 +250,11 @@ export function BookingConfirmPage() {
       {state.status === "slot-conflict" && (
         <Card className="screen-state" data-testid="booking-slot-conflict">
           <CardHeader>
-            <Badge>409</Badge>
             <CardTitle>Слот уже занят</CardTitle>
-            <CardDescription>Это время уже занято. Вернитесь к слотам и выберите другой интервал.</CardDescription>
+            <CardDescription>Это время уже занято. Вернитесь к списку и выберите другой интервал.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="screen-state__message">
-              Детали: <code>{state.message}</code>
-            </p>
+            <p className="screen-note screen-note--muted">{state.message}</p>
             <div className="screen-actions">
               <Link className={cn("ui-button", "ui-button--primary")} to={`/book/${eventTypeId}`}>
                 Выбрать другой слот
@@ -307,14 +267,11 @@ export function BookingConfirmPage() {
       {state.status === "rule-violation" && (
         <Card className="screen-state" data-testid="booking-rule-violation">
           <CardHeader>
-            <Badge>422</Badge>
-            <CardTitle>Слот больше не проходит правила бронирования</CardTitle>
-            <CardDescription>Текущее время больше недоступно для записи по правилам сервиса.</CardDescription>
+            <CardTitle>Это время больше недоступно</CardTitle>
+            <CardDescription>Откройте список слотов и выберите другой вариант.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="screen-state__message">
-              Детали: <code>{state.message}</code>
-            </p>
+            <p className="screen-note screen-note--muted">{state.message}</p>
             <div className="screen-actions">
               <Link className={cn("ui-button", "ui-button--primary")} to={`/book/${eventTypeId}`}>
                 Вернуться к слотам
@@ -327,17 +284,14 @@ export function BookingConfirmPage() {
       {state.status === "error" && state.slot && (
         <Card className="screen-state">
           <CardHeader>
-            <Badge>Ошибка</Badge>
             <CardTitle>Не удалось создать бронирование</CardTitle>
-            <CardDescription>Сервис не подтвердил запись. Попробуйте выбрать слот заново или повторить попытку позже.</CardDescription>
+            <CardDescription>Попробуйте выбрать слот заново или повторить попытку чуть позже.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="screen-state__message">
-              Детали: <code>{state.message}</code>
-            </p>
+            <p className="screen-note screen-note--muted">{state.message}</p>
             <div className="screen-actions">
               <Link className={cn("ui-button", "ui-button--ghost")} to={`/book/${eventTypeId}`}>
-                Назад к слотам
+                Вернуться к слотам
               </Link>
             </div>
           </CardContent>
@@ -365,7 +319,7 @@ function buildInitialState(
   if (!eventTypeId) {
     return {
       status: "error",
-      message: "Не удалось определить тип события по текущей ссылке.",
+      message: "Не удалось определить тип встречи по текущей ссылке.",
     };
   }
 

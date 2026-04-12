@@ -1,5 +1,4 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { createEventType, isCreateEventTypeValidationError } from "@/lib/api/event-types";
@@ -54,14 +53,14 @@ export function AdminPage() {
           bookings,
         });
       })
-      .catch((error: unknown) => {
+      .catch(() => {
         if (controller.signal.aborted) {
           return;
         }
 
         setUpcomingState({
           status: "error",
-          message: error instanceof Error ? error.message : "Unknown error",
+          message: "Попробуйте обновить страницу чуть позже.",
         });
       });
 
@@ -91,7 +90,7 @@ export function AdminPage() {
     if (!name || !description || !Number.isInteger(durationMinutes) || durationMinutes <= 0) {
       setCreateState({
         status: "error",
-        message: "Заполните name, description и durationMinutes корректными значениями.",
+        message: "Заполните название, описание и длительность встречи.",
       });
       return;
     }
@@ -112,7 +111,7 @@ export function AdminPage() {
       setFormValues(initialFormValues);
     } catch (error: unknown) {
       if (isCreateEventTypeValidationError(error)) {
-        const details = error.details?.length ? ` (${error.details.join("; ")})` : "";
+        const details = error.details?.length ? ` Проверьте поля: ${error.details.join("; ")}.` : "";
 
         setCreateState({
           status: "error",
@@ -123,7 +122,7 @@ export function AdminPage() {
 
       setCreateState({
         status: "error",
-        message: error instanceof Error ? error.message : "Unknown error",
+        message: "Не удалось сохранить тип встречи. Попробуйте ещё раз.",
       });
     }
   }
@@ -132,9 +131,8 @@ export function AdminPage() {
     <section className="screen-grid screen-grid--admin">
       <Card>
         <CardHeader>
-          <Badge>Панель владельца</Badge>
-          <CardTitle>Создание типа события</CardTitle>
-          <CardDescription>Создайте тип встречи, который появится на публичной странице записи.</CardDescription>
+          <CardTitle>Новый тип встречи</CardTitle>
+          <CardDescription>Он сразу появится на странице записи и будет доступен для бронирования.</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="admin-form" data-testid="event-type-form" onSubmit={handleSubmit}>
@@ -146,7 +144,7 @@ export function AdminPage() {
                 name="name"
                 value={formValues.name}
                 onChange={(event) => handleChange("name", event.target.value)}
-                placeholder="Demo call"
+                placeholder="Короткое знакомство"
                 autoComplete="off"
               />
             </label>
@@ -158,7 +156,7 @@ export function AdminPage() {
                 name="description"
                 value={formValues.description}
                 onChange={(event) => handleChange("description", event.target.value)}
-                placeholder="First event type"
+                placeholder="15-минутный созвон, чтобы быстро обсудить задачу"
                 rows={4}
               />
             </label>
@@ -178,35 +176,29 @@ export function AdminPage() {
 
             <div className="screen-actions">
               <Button data-testid="event-type-submit" type="submit" disabled={createState.status === "submitting"}>
-                {createState.status === "submitting" ? "Создаём тип события..." : "Создать тип события"}
+                {createState.status === "submitting" ? "Сохраняем..." : "Сохранить тип встречи"}
               </Button>
             </div>
           </form>
 
           {createState.status === "idle" && (
-            <p className="admin-inline-note">Заполните форму и создайте новый тип события для гостевого сценария.</p>
+            <p className="admin-inline-note">Новый тип встречи будет виден на странице записи сразу после сохранения.</p>
           )}
 
           {createState.status === "success" && (
             <div className="admin-feedback admin-feedback--success" data-testid="event-type-success">
-              <p className="admin-feedback__title">Тип события создан</p>
+              <p className="admin-feedback__title">Тип встречи сохранён</p>
               <p className="admin-feedback__text">
-                Название: <strong>{createState.eventType.name}</strong>
+                <strong>{createState.eventType.name}</strong> · {createState.eventType.durationMinutes} мин
               </p>
-              <p className="admin-feedback__text">Описание: {createState.eventType.description}</p>
-              <p className="admin-feedback__text">Длительность: {createState.eventType.durationMinutes} мин.</p>
-              <p className="admin-feedback__text">
-                ID: <code>{createState.eventType.id}</code>
-              </p>
+              <p className="admin-feedback__text">{createState.eventType.description}</p>
             </div>
           )}
 
           {createState.status === "error" && (
             <div className="admin-feedback admin-feedback--error" data-testid="event-type-error">
-              <p className="admin-feedback__title">Не удалось создать тип события</p>
-              <p className="admin-feedback__text">
-                <code>{createState.message}</code>
-              </p>
+              <p className="admin-feedback__title">Не удалось сохранить тип встречи</p>
+              <p className="admin-feedback__text">{createState.message}</p>
             </div>
           )}
         </CardContent>
@@ -214,31 +206,28 @@ export function AdminPage() {
 
       <Card>
         <CardHeader>
-          <Badge>Owner flow</Badge>
-          <CardTitle>Предстоящие записи</CardTitle>
-          <CardDescription>Здесь владелец видит все будущие бронирования, созданные в публичном сценарии.</CardDescription>
+          <CardTitle>Предстоящие встречи</CardTitle>
+          <CardDescription>Новые записи появятся здесь автоматически после подтверждения.</CardDescription>
         </CardHeader>
         <CardContent data-testid="upcoming-bookings">
           {upcomingState.status === "loading" && (
             <div className="admin-feedback">
-              <p className="admin-feedback__title">Загрузка</p>
-              <p className="admin-feedback__text">Загружаем предстоящие записи владельца.</p>
+              <p className="admin-feedback__title">Загружаем встречи</p>
+              <p className="admin-feedback__text">Сейчас покажем ближайшие бронирования.</p>
             </div>
           )}
 
           {upcomingState.status === "empty" && (
             <div className="admin-feedback">
-              <p className="admin-feedback__title">Пусто</p>
-              <p className="admin-feedback__text">Предстоящих бронирований пока нет.</p>
+              <p className="admin-feedback__title">Пока пусто</p>
+              <p className="admin-feedback__text">Как только кто-то подтвердит запись, встреча появится здесь.</p>
             </div>
           )}
 
           {upcomingState.status === "error" && (
             <div className="admin-feedback admin-feedback--error">
-              <p className="admin-feedback__title">Ошибка</p>
-              <p className="admin-feedback__text">
-                <code>{upcomingState.message}</code>
-              </p>
+              <p className="admin-feedback__title">Не удалось загрузить встречи</p>
+              <p className="admin-feedback__text">{upcomingState.message}</p>
             </div>
           )}
 
@@ -248,9 +237,7 @@ export function AdminPage() {
                 <article key={booking.id} className="admin-list__item" data-testid="upcoming-booking-item">
                   <div className="admin-list__heading">
                     <strong>{booking.eventTypeName}</strong>
-                    <span>
-                      <code>{booking.eventTypeId}</code>
-                    </span>
+                    <span className="admin-list__eyebrow">{formatUtcDateTime(booking.startAt)} UTC</span>
                   </div>
                   <dl className="summary-list">
                     <div className="summary-list__row">
@@ -262,7 +249,7 @@ export function AdminPage() {
                       <dd>{formatUtcDateTime(booking.endAt)} UTC</dd>
                     </div>
                     <div className="summary-list__row">
-                      <dt>Создано</dt>
+                      <dt>Создана</dt>
                       <dd>{formatUtcDateTime(booking.createdAt)} UTC</dd>
                     </div>
                   </dl>

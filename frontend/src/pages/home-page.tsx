@@ -23,14 +23,14 @@ export function HomePage() {
       .then((eventTypes) => {
         setState({ status: "success", eventTypes });
       })
-      .catch((error: unknown) => {
+      .catch(() => {
         if (controller.signal.aborted) {
           return;
         }
 
         setState({
           status: "error",
-          message: error instanceof Error ? error.message : "Unknown error",
+          message: "Не удалось загрузить встречи.",
         });
       });
 
@@ -41,29 +41,21 @@ export function HomePage() {
 
   return (
     <section className="screen-grid">
-      <Card>
-        <CardHeader>
-          <Badge>Публичная запись</Badge>
+      <Card className="hero-card">
+        <CardHeader className="hero-card__header">
           <CardTitle>Выберите тип встречи</CardTitle>
-          <CardDescription>
-            Это публичная страница записи. Гость начинает сценарий с выбора подходящего формата встречи.
-          </CardDescription>
+          <CardDescription>Подберите подходящий формат, а на следующем шаге мы покажем свободное время.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <ul className="screen-list">
-            <li>Выберите подходящий тип встречи.</li>
-            <li>Откройте свободные слоты на ближайшие 14 дней.</li>
-            <li>Подтвердите бронирование на следующем шаге.</li>
-          </ul>
+        <CardContent className="hero-card__content">
+          <p className="screen-note">Короткие варианты для знакомства, обсуждения задачи или быстрого созвона.</p>
         </CardContent>
       </Card>
 
       {state.status === "loading" && (
         <Card className="screen-state">
           <CardHeader>
-            <Badge>Загрузка</Badge>
             <CardTitle>Загружаем доступные встречи</CardTitle>
-            <CardDescription>Получаем список типов событий для публичной записи.</CardDescription>
+            <CardDescription>Сейчас появятся форматы, которые можно забронировать.</CardDescription>
           </CardHeader>
         </Card>
       )}
@@ -71,29 +63,22 @@ export function HomePage() {
       {state.status === "error" && (
         <Card className="screen-state">
           <CardHeader>
-            <Badge>Ошибка</Badge>
             <CardTitle>Не удалось открыть список встреч</CardTitle>
-            <CardDescription>Сервис временно недоступен. Попробуйте обновить страницу или проверьте доступность API.</CardDescription>
+            <CardDescription>{state.message}</CardDescription>
           </CardHeader>
-          <CardContent>
-            <p className="screen-state__message">
-              Детали: <code>{state.message}</code>
-            </p>
-          </CardContent>
         </Card>
       )}
 
       {state.status === "success" && state.eventTypes.length === 0 && (
         <Card className="screen-state">
           <CardHeader>
-            <Badge>Пусто</Badge>
-            <CardTitle>Пока нет доступных встреч</CardTitle>
-            <CardDescription>Сначала создайте хотя бы один тип события в панели владельца.</CardDescription>
+            <CardTitle>Встреч пока нет</CardTitle>
+            <CardDescription>Добавьте первый тип встречи в разделе управления, и он сразу появится здесь.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="screen-actions">
               <Link className={cn("ui-button", "ui-button--primary")} to="/admin">
-                Открыть панель владельца
+                Открыть управление
               </Link>
             </div>
           </CardContent>
@@ -109,11 +94,8 @@ export function HomePage() {
                 <CardTitle>{eventType.name}</CardTitle>
                 <CardDescription>{eventType.description}</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="event-type-card__meta">
-                  <span>Длительность: {formatDuration(eventType.durationMinutes)}</span>
-                  <span>Следующий шаг: выбор времени</span>
-                </div>
+              <CardContent className="event-type-card__content">
+                <p className="event-type-card__meta">Свободные слоты на ближайшие 14 дней.</p>
                 <Link
                   className={cn("ui-button", "ui-button--primary", "screen-action")}
                   data-testid="event-type-open"

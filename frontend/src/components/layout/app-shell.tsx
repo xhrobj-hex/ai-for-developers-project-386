@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { to: "/", label: "Запись", end: true },
-  { to: "/admin", label: "Владелец", end: false },
+  { to: "/admin", label: "Управление", end: false },
 ];
 
 export function AppShell() {
@@ -11,11 +11,11 @@ export function AppShell() {
     <div className="app-shell">
       <header className="app-header">
         <div className="app-header__inner">
-          <div>
-            <p className="app-header__eyebrow">Демо сервиса бронирования</p>
+          <div className="app-header__copy">
+            <p className="app-header__eyebrow">Простое бронирование встреч</p>
             <h1 className="app-header__title">Календарь звонков</h1>
             <p className="app-header__lead">
-              Гость выбирает тип встречи и свободное время, владелец создаёт события и видит предстоящие бронирования.
+              Выберите формат встречи, свободное время и подтвердите запись за пару шагов.
             </p>
           </div>
           <nav className="app-nav" aria-label="Основная навигация">
